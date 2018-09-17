@@ -146,6 +146,13 @@
             </completers>
         </command>
 
+        <command>
+            <action class="org.onosproject.drivers.fujitsu.cli.MxpCreateSubscription"/>
+            <completers>
+                <ref component-id="deviceIdCompleter"/>
+            </completers>
+        </command>
+
     </command-bundle>
 
     <bean id="deviceIdCompleter" class="org.onosproject.cli.net.DeviceIdCompleter"/>

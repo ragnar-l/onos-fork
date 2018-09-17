@@ -41,6 +41,9 @@
         <behaviour api="org.onosproject.incubator.net.faultmanagement.alarm.AlarmConsumer"
                    impl="org.onosproject.drivers.fujitsu.FujitsuVoltAlarmConsumer"/>
 
+        <behaviour api="org.onosproject.net.behaviour.MxpSubscription"
+                   impl="org.onosproject.drivers.fujitsu.AlturaMxpCreateSubscription"/>
+
         <behaviour api="org.onosproject.net.behaviour.MxpGetAll"
                    impl="org.onosproject.drivers.fujitsu.AlturaMxpGetAll"/>
         <behaviour api="org.onosproject.net.behaviour.MxpConfig"
