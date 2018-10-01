@@ -38,7 +38,8 @@
         <onos.app.url>http://onosproject.org</onos.app.url>
         <onos.app.requires>
             org.onosproject.netconf,
-            org.onosproject.optical-model
+            org.onosproject.optical-model,
+            org.onosproject.linkdiscovery
         </onos.app.requires>
     </properties>
 

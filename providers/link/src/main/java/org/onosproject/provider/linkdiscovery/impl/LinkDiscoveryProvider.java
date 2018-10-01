@@ -194,6 +194,7 @@ public class LinkDiscoveryProvider extends AbstractProvider
     }
 
     private void discoverLinksTasks() {
+        log.info("ENTRE A discoverLinksTasks");
         deviceService.getAvailableDevices().forEach(device -> {
             if (isSupported(device)) {
                 evaluateLinks(device.id(), device.as(LinkDiscovery.class).getLinks());
@@ -253,7 +254,7 @@ public class LinkDiscoveryProvider extends AbstractProvider
         boolean supported = mastershipService.isLocalMaster(device.id())
                 && device.is(LinkDiscovery.class);
         if (!supported) {
-            log.debug("Device {} does not support LinkDiscovery", device);
+            log.info("Device {} does not support LinkDiscovery", device);
         }
         return supported;
     }

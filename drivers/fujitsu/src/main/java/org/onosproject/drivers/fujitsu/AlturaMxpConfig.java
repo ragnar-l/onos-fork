@@ -454,6 +454,45 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
         return reply;
     }
 
+    /*
+    @Override
+    public String neighborDiscovery() {
+        DriverHandler handler = handler();
+        NetconfController controller = handler.get(NetconfController.class);
+        MastershipService mastershipService = handler.get(MastershipService.class);
+        DeviceId ncDeviceId = handler.data().deviceId();
+        checkNotNull(controller, "Netconf controller is null");
+        String reply = null;
+
+        if (!mastershipService.isLocalMaster(ncDeviceId)) {
+            log.warn("Not master for {} Use {} to execute command",
+                    ncDeviceId,
+                    mastershipService.getMasterFor(ncDeviceId));
+            return null;
+        }
+
+
+        try {
+            StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+            request.append("<deviceneighbors/>");
+            request.append("</mux-config>");
+            request.append("<mux-state xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+            request.append("<xfp_rx_power/>");
+            request.append("</mux-state>");
+
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+        return reply;
+    } */
+
+
+
     /**
      * Verifies input string for ponlink-id{-onu-id}.
      *

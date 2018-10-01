@@ -33,5 +33,5 @@ onos_app (
     url = 'http://onosproject.org',
     description = 'Adds support for Altura devices.',
     included_bundles = BUNDLES,
-    required_apps = [ 'org.onosproject.netconf', 'org.onosproject.optical-model', 'org.onosproject.drivers.optical' ],
+    required_apps = [ 'org.onosproject.netconf', 'org.onosproject.optical-model', 'org.onosproject.drivers.optical', 'org.onosproject.linkdiscovery' ],
 )

@@ -143,6 +143,8 @@ public class Ea1000DeviceDescription extends AbstractHandlerBehaviour implements
                 .build();
         ports.add(optics);
 
+
+
         DefaultAnnotations annotationHost = DefaultAnnotations.builder().set(AnnotationKeys.PORT_NAME, "Host").build();
         PortDescription host = DefaultPortDescription.builder()
                 .withPortNumber(PortNumber.portNumber(1))

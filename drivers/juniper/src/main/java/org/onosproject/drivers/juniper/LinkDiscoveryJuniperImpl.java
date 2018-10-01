@@ -58,6 +58,7 @@ public class LinkDiscoveryJuniperImpl extends AbstractHandlerBehaviour
     @Override
     public Set<LinkDescription> getLinks() {
         DeviceId localDeviceId = this.handler().data().deviceId();
+
         NetconfController controller =
                 checkNotNull(handler().get(NetconfController.class));
         NetconfSession session =

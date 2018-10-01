@@ -96,4 +96,12 @@ public interface MxpConfig extends HandlerBehaviour {
      */
     String setValueRxPowerNotify(String value_rx_power_notify_config);
 
+
+    /**
+     * Descubre el vecino.
+     *
+     * @return response string
+     */
+    //String neighborDiscovery();
+
 }

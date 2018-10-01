@@ -46,6 +46,20 @@ import static org.onosproject.net.optical.device.OchPortHelper.ochPortDescriptio
 import static org.onosproject.net.optical.device.OduCltPortHelper.oduCltPortDescription;
 import static org.slf4j.LoggerFactory.getLogger;
 
+
+
+import org.onosproject.net.DefaultAnnotations;
+import java.util.ArrayList;
+import java.util.List;
+import org.onosproject.net.Port;
+import org.onosproject.net.PortNumber;
+import org.onosproject.net.device.DefaultPortDescription;
+import org.onosproject.net.Device;
+import org.onosproject.net.DeviceId;
+import org.onosproject.net.device.DefaultDeviceDescription;
+import org.onosproject.net.device.DeviceService;
+
+
 /**
  * Retrieves the ports (sin informacion por ahora - que puertos?) from a Altura MXP40gb device via netconf.
  */
@@ -56,16 +70,55 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
 
     @Override
     public DeviceDescription discoverDeviceDetails() {
-        log.info("No description to be added for device");
-        //TODO to be implemented if needed.
-        return null;
+        /*
+        NetconfController controller = checkNotNull(handler().get(NetconfController.class));
+        NetconfSession session = controller.getDevicesMap().get(handler().data().deviceId()).getSession();
+        try {
+            version = session.get(showVersionRequestBuilder());
+        } catch (NetconfException e) {
+            throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
+        }
+
+        String[] details = TextBlockParserCisco.parseCiscoIosDeviceDetails(version);
+        */
+
+        DeviceService deviceService = checkNotNull(handler().get(DeviceService.class));
+        DeviceId deviceId = handler().data().deviceId();
+        Device device = deviceService.getDevice(deviceId);
+
+        return new DefaultDeviceDescription(device.id().uri(), Device.Type.OTN,
+                "ALTURA", "1.0",
+                null, null,
+                null);
     }
 
     @Override
     public List<PortDescription> discoverPortDetails() {
-        log.debug("Discovering device ports");
-        //TODO to be implemented if needed.
-        return ImmutableList.of();
+
+        List<PortDescription> ports = new ArrayList<PortDescription>();
+
+        DefaultAnnotations annotationOptics = DefaultAnnotations.builder().set(AnnotationKeys.PORT_NAME, "Optics")
+                .build();
+        PortDescription optics = DefaultPortDescription.builder()
+                .withPortNumber(PortNumber.portNumber(0))
+                .isEnabled(true)
+                .type(Port.Type.FIBER)
+                .portSpeed(1000)
+                .annotations(annotationOptics)
+                .build();
+        ports.add(optics);
+
+        DefaultAnnotations annotationHost = DefaultAnnotations.builder().set(AnnotationKeys.PORT_NAME, "Host").build();
+        PortDescription host = DefaultPortDescription.builder()
+                .withPortNumber(PortNumber.portNumber(1))
+                .isEnabled(true)
+                .type(Port.Type.COPPER)
+                .portSpeed(1000)
+                .annotations(annotationHost)
+                .build();
+        ports.add(host);
+
+        return ports;
     }
 
 }
