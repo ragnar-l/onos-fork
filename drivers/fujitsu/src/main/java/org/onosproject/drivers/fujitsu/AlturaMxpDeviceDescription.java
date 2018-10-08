@@ -81,7 +81,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         request.append("</mux-state>");
         String version = null;
         try {
-            version = session.get(request.toString(), REPORT_ALL);
+            version = session.get(request.toString());
         } catch (NetconfException e) {
             throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
         }
