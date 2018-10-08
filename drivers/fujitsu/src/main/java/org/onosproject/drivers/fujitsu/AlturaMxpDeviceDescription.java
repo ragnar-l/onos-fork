@@ -79,6 +79,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         request.append("<device_hwVersion/>");
         request.append("<device_boardId/>");
         request.append("</mux-state>");
+        String version = null;
         try {
             version = session.get(request.toString(), REPORT_ALL);
         } catch (NetconfException e) {
