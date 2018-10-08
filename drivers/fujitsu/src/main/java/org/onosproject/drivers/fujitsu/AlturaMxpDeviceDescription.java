@@ -70,17 +70,23 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
 
     @Override
     public DeviceDescription discoverDeviceDetails() {
-        /*
+
         NetconfController controller = checkNotNull(handler().get(NetconfController.class));
         NetconfSession session = controller.getDevicesMap().get(handler().data().deviceId()).getSession();
+        StringBuilder request = new StringBuilder("<mux-state xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+        request.append("<device_manufacturer/>");
+        request.append("<device_swVersion/>");
+        request.append("<device_hwVersion/>");
+        request.append("<device_boardId/>");
+        request.append("</mux-state>");
         try {
-            version = session.get(showVersionRequestBuilder());
+            version = session.get(request.toString(), REPORT_ALL);
         } catch (NetconfException e) {
             throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
         }
 
-        String[] details = TextBlockParserCisco.parseCiscoIosDeviceDetails(version);
-        */
+        //String[] details = TextBlockParserCisco.parseCiscoIosDeviceDetails(version);
+
 
         DeviceService deviceService = checkNotNull(handler().get(DeviceService.class));
         DeviceId deviceId = handler().data().deviceId();
