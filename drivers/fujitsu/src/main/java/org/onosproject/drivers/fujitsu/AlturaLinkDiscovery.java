@@ -60,7 +60,10 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
             request.append("<deviceneighbors/>");
             request.append("</mux-config>");
             request.append("<mux-state xmlns=\"http://fulgor.com/ns/cli-mxp\">");
-            request.append("<xfp_rx_power/>");
+            request.append("<device_manufacturer/>");
+            request.append("<device_swVersion/>"); 
+	    request.append("<device_hwVersion/>");
+	    request.append("<device_boardId/>");
             request.append("</mux-state>");
 
             reply = controller
