@@ -27,6 +27,11 @@ import org.onosproject.netconf.NetconfController;
 import org.onosproject.netconf.NetconfException;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.apache.commons.lang.StringUtils;
+
+import org.onosproject.incubator.net.faultmanagement.alarm.AlarmService;
+import org.onosproject.incubator.net.faultmanagement.alarm.Alarm;
+
 public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         implements LinkDiscovery {
 
@@ -38,6 +43,8 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
 
 
         log.info("ENTRO A LinkDiscovery");
+
+
 
 
         DriverHandler handler = handler();
@@ -54,19 +61,36 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
             return null;
         }
 
+        Set<LinkDescription> descs = new HashSet<>();
+        /*
+        try {
+            StringBuilder request = new StringBuilder("<mux-state xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+            request.append("<xfp_rx_power/>");
+            request.append("</mux-state>");
+
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+
+        log.info(reply);
+        String nivelPotenciaSalida = xfpRxPower(reply);
+
+        if (nivelPotenciaSalida) {
+            return descs;
+
+        }
+        */
 
         try {
             StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
             request.append("<deviceneighbors/>");
             request.append("</mux-config>");
-            /*
-            request.append("<mux-state xmlns=\"http://fulgor.com/ns/cli-mxp\">");
-            request.append("<device_manufacturer/>");
-            request.append("<device_swVersion/>"); 
-	        request.append("<device_hwVersion/>");
-	        request.append("<device_boardId/>");
-            request.append("</mux-state>");
-            */
+
             reply = controller
                     .getDevicesMap()
                     .get(ncDeviceId)
@@ -82,24 +106,35 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         DeviceId localDeviceId = this.handler().data().deviceId();
         Port localPort = deviceService.getPorts(localDeviceId).get(0);
 
-        String uriremote;
-        if (localDeviceId.uri().toString().equals("netconf:172.17.0.2:830")) {
-            uriremote="netconf:172.17.0.3:830";
-        }
-        else
-            uriremote="netconf:172.17.0.2:830";
+        String vecino = serialNumber(reply);
 
+
+        //find destination device by remote serial number id
         com.google.common.base.Optional<Device> dev = Iterables.tryFind(
                 deviceService.getAvailableDevices(),
-                input -> input.id().equals(DeviceId.deviceId(uriremote)));
+                input -> input.serialNumber().equals(vecino));
+        if (!dev.isPresent()) {
+            log.info("Device with chassis ID {} does not exist");
+            return descs;
+
+        }
+
+        AlarmService alarmService = this.handler().get(AlarmService.class);
+
+        try {
+            for ( Alarm a : alarmService.getAlarms(localDeviceId)) {
+                if ( (a.id().toString().contains("RXS")) || (a.id().toString().contains("Rx LOCK ERR")) ) {
+                    return descs;
+                }
+            }
+        }
+        catch (NullPointerException e){
+
+        }
 
         Device remoteDevice = dev.get();
 
         Port remotePort = deviceService.getPorts(remoteDevice.id()).get(0);
-
-
-        Set<LinkDescription> descs = new HashSet<>();
-
 
         ConnectPoint local = new ConnectPoint(localDeviceId, localPort.number());
         ConnectPoint remote = new ConnectPoint(remoteDevice.id(), remotePort.number());
@@ -108,9 +143,31 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                 .build();
         descs.add(new DefaultLinkDescription(
                 local, remote, Link.Type.OPTICAL, false, annotations));
+        /*
         descs.add(new DefaultLinkDescription(
                 remote, local, Link.Type.OPTICAL, false, annotations));
-
+        */
         return descs;
+    }
+
+
+    /**
+     * Retrieving serial number version of device.
+     * @param version the return of show version command
+     * @return the serial number of the device
+     */
+    private static String serialNumber(String version) {
+        String serialNumber = StringUtils.substringBetween(version, "<deviceneighbors>", "</deviceneighbors>");
+        return serialNumber;
+    }
+
+    /**
+     * Retrieving potencia de recepcion de lado de linea of device.
+     * @param version the return of show version command
+     * @return potencia de recepcion de lado de linea of the device
+     */
+    private static String xfpRxPower(String version) {
+        String xfpRxPower = StringUtils.substringBetween(version, "<xfp_rx_power>", "</xfp_rx_power>");
+        return xfpRxPower;
     }
 }

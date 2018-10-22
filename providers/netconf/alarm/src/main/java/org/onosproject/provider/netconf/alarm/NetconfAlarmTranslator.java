@@ -47,6 +47,7 @@ import java.util.Collection;
 import org.xml.sax.SAXException;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Translates NETCONF notification messages to actions on alarms.
@@ -77,10 +78,22 @@ public class NetconfAlarmTranslator implements AlarmTranslator {
             while (descriptionNode != null) {
                 if (descriptionNode.getNodeType() == Node.ELEMENT_NODE) {
                     String description = nodeToString(descriptionNode);
-                    alarms.add(new DefaultAlarm.Builder(AlarmId.alarmId(deviceId, Long.toString(timeStamp)),
-                                                        deviceId, description,
-                                                        Alarm.SeverityLevel.WARNING,
-                                                        timeStamp).build());
+
+
+                    if(description.contains("mux-notify")){
+                        String identificador = getNotify(description);
+                        alarms.add(new DefaultAlarm.Builder(AlarmId.alarmId(deviceId, identificador),
+                                deviceId, description,
+                                Alarm.SeverityLevel.WARNING,
+                                timeStamp).build());
+                    }
+
+                    else {
+                        alarms.add(new DefaultAlarm.Builder(AlarmId.alarmId(deviceId, Long.toString(timeStamp)),
+                                deviceId, description,
+                                Alarm.SeverityLevel.WARNING,
+                                timeStamp).build());
+                    }
                     descriptionNode = null;
                 } else {
                     descriptionNode = descriptionNode.getNextSibling();
@@ -130,5 +143,22 @@ public class NetconfAlarmTranslator implements AlarmTranslator {
         DOMSource source = new DOMSource(rootNode);
         transformer.transform(source, new StreamResult(writer));
         return writer.getBuffer().toString();
+    }
+
+    /**
+     * Retrieving manufacturer of device.
+     * @param version the return of show version command
+     * @return the manufacturer of the device
+     */
+    private static String getNotify(String parseame) {
+        String notify = StringUtils.substringBetween(parseame, "<INFO>", "</INFO>");
+        String substring;
+        if (notify.contains("[ALARM] ")){
+            substring=notify.substring(8, notify.length());
+        }
+        else {
+            substring=notify.substring(5, notify.length());
+        }
+        return substring;
     }
 }

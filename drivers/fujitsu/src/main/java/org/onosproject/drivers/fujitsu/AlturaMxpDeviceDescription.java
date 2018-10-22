@@ -59,6 +59,7 @@ import org.onosproject.net.DeviceId;
 import org.onosproject.net.device.DefaultDeviceDescription;
 import org.onosproject.net.device.DeviceService;
 
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Retrieves the ports (sin informacion por ahora - que puertos?) from a Altura MXP40gb device via netconf.
@@ -73,31 +74,42 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
 
         NetconfController controller = checkNotNull(handler().get(NetconfController.class));
         NetconfSession session = controller.getDevicesMap().get(handler().data().deviceId()).getSession();
-        StringBuilder request = new StringBuilder("<mux-state xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+        StringBuilder request = new StringBuilder("<get>");
+        request.append("<filter type=\"subtree\">");
+        request.append("<mux-state xmlns=\"http://fulgor.com/ns/cli-mxp\">");
         request.append("<device_manufacturer/>");
         request.append("<device_swVersion/>");
         request.append("<device_hwVersion/>");
         request.append("<device_boardId/>");
         request.append("</mux-state>");
+        request.append("</filter>");
+        request.append("</get>");
+
         String version = null;
+
         try {
-            version = session.get(request.toString());
+            version = session.doWrappedRpc(request.toString());
         } catch (NetconfException e) {
             throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
         }
 
-        //String[] details = TextBlockParserCisco.parseCiscoIosDeviceDetails(version);
-
+        String[] details = new String[4];
+        details[0] = getManufacturer(version);
+        details[1] = getHwVersion(version);
+        details[2] = getSwVersion(version);
+        details[3] = serialNumber(version);
 
         DeviceService deviceService = checkNotNull(handler().get(DeviceService.class));
         DeviceId deviceId = handler().data().deviceId();
         Device device = deviceService.getDevice(deviceId);
 
         return new DefaultDeviceDescription(device.id().uri(), Device.Type.OTN,
-                "ALTURA", "1.0",
-                null, null,
+                details[0], details[1],
+                details[2], details[3],
                 null);
     }
+
+
 
     @Override
     public List<PortDescription> discoverPortDetails() {
@@ -126,6 +138,51 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         ports.add(host);
 
         return ports;
+    }
+
+
+
+    /**
+     * Retrieving manufacturer of device.
+     * @param version the return of show version command
+     * @return the manufacturer of the device
+     */
+    private static String getManufacturer(String version) {
+        String manufacturer = StringUtils.substringBetween(version, "<device_manufacturer>", "</device_manufacturer>");
+        return manufacturer;
+    }
+
+
+    /**
+     * Retrieving sw version of device.
+     * @param version the return of show version command
+     * @return the sw version of the device
+     */
+    private static String getSwVersion(String version) {
+        String swVersion = StringUtils.substringBetween(version, "<device_swVersion>", "</device_swVersion>");
+        return swVersion;
+    }
+
+
+    /**
+     * Retrieving hw version of device.
+     * @param version the return of show version command
+     * @return the hw version of the device
+     */
+    private static String getHwVersion(String version) {
+        String hwVersion = StringUtils.substringBetween(version, "<device_hwVersion>", "</device_hwVersion>");
+        return hwVersion;
+    }
+
+
+    /**
+     * Retrieving serial number version of device.
+     * @param version the return of show version command
+     * @return the serial number of the device
+     */
+    private static String serialNumber(String version) {
+        String serialNumber = StringUtils.substringBetween(version, "<device_boardId>", "</device_boardId>");
+        return serialNumber;
     }
 
 }

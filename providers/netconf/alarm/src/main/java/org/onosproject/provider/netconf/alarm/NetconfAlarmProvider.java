@@ -107,8 +107,9 @@ public class NetconfAlarmProvider extends AbstractProvider implements AlarmProvi
     }
 
     private void triggerProbe(DeviceId deviceId, Collection<Alarm> alarms) {
-        providerService.updateAlarmList(deviceId, alarms);
         triggerProbe(deviceId);
+        providerService.updateAlarmList(deviceId, alarms);
+
     }
 
     private class InternalNotificationListener
@@ -124,6 +125,8 @@ public class NetconfAlarmProvider extends AbstractProvider implements AlarmProvi
             if (event.type() == NetconfDeviceOutputEvent.Type.DEVICE_NOTIFICATION) {
                 DeviceId deviceId = event.getDeviceInfo().getDeviceId();
                 String message = event.getMessagePayload();
+                //log.info("MENSAJE:");
+                //log.info(message);
                 InputStream in = new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8));
                 Collection<Alarm> newAlarms = translator.translateToAlarm(deviceId, in);
                 triggerProbe(deviceId, newAlarms);
