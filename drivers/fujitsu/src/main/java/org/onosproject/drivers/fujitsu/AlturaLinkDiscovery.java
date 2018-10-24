@@ -62,29 +62,6 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         }
 
         Set<LinkDescription> descs = new HashSet<>();
-        /*
-        try {
-            StringBuilder request = new StringBuilder("<mux-state xmlns=\"http://fulgor.com/ns/cli-mxp\">");
-            request.append("<xfp_rx_power/>");
-            request.append("</mux-state>");
-
-            reply = controller
-                    .getDevicesMap()
-                    .get(ncDeviceId)
-                    .getSession()
-                    .get(request.toString(), REPORT_ALL);
-        } catch (NetconfException e) {
-            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
-        }
-
-        log.info(reply);
-        String nivelPotenciaSalida = xfpRxPower(reply);
-
-        if (nivelPotenciaSalida) {
-            return descs;
-
-        }
-        */
 
         try {
             StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");

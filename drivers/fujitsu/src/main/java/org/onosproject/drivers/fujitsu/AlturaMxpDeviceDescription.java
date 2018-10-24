@@ -84,9 +84,9 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         request.append("</mux-state>");
         request.append("</filter>");
         request.append("</get>");
-
+        request.append("<create-subscription xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\"/>");
+        
         String version = null;
-        log.info("ENTRE ACA");
         try {
             version = session.doWrappedRpc(request.toString());
         } catch (NetconfException e) {
