@@ -59,6 +59,7 @@ import static org.onlab.util.Tools.groupedThreads;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.onosproject.netconf.NetconfSession;
+import org.onosproject.net.driver.AbstractHandlerBehaviour;
 
 /**
  * Provider which uses an NETCONF controller to detect device.
