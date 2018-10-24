@@ -86,7 +86,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         request.append("</get>");
 
         String version = null;
-
+        log.info("ENTRE ACA");
         try {
             version = session.doWrappedRpc(request.toString());
         } catch (NetconfException e) {

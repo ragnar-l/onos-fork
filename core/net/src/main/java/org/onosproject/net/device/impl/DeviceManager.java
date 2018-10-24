@@ -370,7 +370,6 @@ public class DeviceManager
         DeviceProvider provider = getProvider(deviceId);
         if (provider != null) {
             boolean reachable = provider.isReachable(deviceId);
-            log.info("ENTRE A PROBAR CONECTIVIDAD");
             if (reachable && !isLocallyConnected(deviceId)) {
                 deviceLocalStatus.put(deviceId, new LocalStatus(true, Instant.now()));
             } else if (!reachable && isLocallyConnected(deviceId)) {
