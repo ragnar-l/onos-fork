@@ -116,7 +116,6 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         if (!dev.isPresent()) {
             log.info("Device with chassis ID {} does not exist");
             return descs;
-
         }
 
         AlarmService alarmService = this.handler().get(AlarmService.class);
@@ -129,7 +128,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
             }
         }
         catch (NullPointerException e){
-
+            log.info("ERROR EN LINK DISCOVERY");
         }
 
         Device remoteDevice = dev.get();
@@ -143,10 +142,6 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                 .build();
         descs.add(new DefaultLinkDescription(
                 local, remote, Link.Type.OPTICAL, false, annotations));
-        /*
-        descs.add(new DefaultLinkDescription(
-                remote, local, Link.Type.OPTICAL, false, annotations));
-        */
         return descs;
     }
 
