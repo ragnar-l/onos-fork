@@ -3,7 +3,6 @@ COMPILE_DEPS = [
     '//lib:JACKSON',
     '//incubator/api:onos-incubator-api',
     '//protocols/netconf/api:onos-protocols-netconf-api',
-    '//lib:jsch',
 
 ]
 

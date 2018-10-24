@@ -58,13 +58,6 @@ import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static org.onlab.util.Tools.groupedThreads;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import java.io.InputStream;
-
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
-
 /**
  * Provider which uses an NETCONF controller to detect device.
  */
@@ -301,12 +294,9 @@ public class NetconfDeviceProvider extends AbstractProvider
         log.debug("Testing reachability for {}:{}", ip, port);
 
 
-        log.info("PRUEBAAAA");
-        log.info("");
-
         try (Socket socket = new Socket(ip, port)) {
             log.debug("rechability of {}, {}, {}", deviceId, socket.isConnected(), !socket.isClosed());
-            return false;//socket.isConnected() && !socket.isClosed();
+            return socket.isConnected() && !socket.isClosed();
         } catch (IOException e) {
             log.info("Device {} is not reachable", deviceId);
             log.debug("  error details", e);
