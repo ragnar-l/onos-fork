@@ -84,8 +84,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         request.append("</mux-state>");
         request.append("</filter>");
         request.append("</get>");
-        request.append("<create-subscription xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\"/>");
-        
+
         String version = null;
         try {
             version = session.doWrappedRpc(request.toString());
@@ -98,6 +97,16 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         details[1] = getHwVersion(version);
         details[2] = getSwVersion(version);
         details[3] = serialNumber(version);
+
+        StringBuilder suscribe = new StringBuilder("<create-subscription xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\"/>");
+        try {
+            version = session.doWrappedRpc(suscribe.toString());
+            log.info("RESPUESTA");
+            log.info(version);
+        } catch (NetconfException e) {
+            throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
+        }
+
 
         DeviceService deviceService = checkNotNull(handler().get(DeviceService.class));
         DeviceId deviceId = handler().data().deviceId();
