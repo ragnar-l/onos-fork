@@ -58,6 +58,8 @@ import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static org.onlab.util.Tools.groupedThreads;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.onosproject.netconf.NetconfSession;
+
 /**
  * Provider which uses an NETCONF controller to detect device.
  */
@@ -293,11 +295,32 @@ public class NetconfDeviceProvider extends AbstractProvider
         //test connection to device opening a socket to it.
         log.debug("Testing reachability for {}:{}", ip, port);
 
+        NetconfController controller = checkNotNull(handler().get(NetconfController.class));
+        NetconfSession session = controller.getDevicesMap().get(handler().data().deviceId()).getSession();
+        StringBuilder request = new StringBuilder("<get>");
+        request.append("<filter type=\"subtree\">");
+        request.append("<mux-state xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+        request.append("<device_manufacturer/>");
+        request.append("<device_swVersion/>");
+        request.append("<device_hwVersion/>");
+        request.append("<device_boardId/>");
+        request.append("</mux-state>");
+        request.append("</filter>");
+        request.append("</get>");
+        String version = null;
 
+        try {
+            version = session.doWrappedRpc(request.toString());
+        } catch (NetconfException e) {
+            throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
+        }
+
+        log.info("PRUEBAAAA");
+        log.info(version);
 
         try (Socket socket = new Socket(ip, port)) {
             log.debug("rechability of {}, {}, {}", deviceId, socket.isConnected(), !socket.isClosed());
-            return socket.isConnected() && !socket.isClosed();
+            return false;//socket.isConnected() && !socket.isClosed();
         } catch (IOException e) {
             log.info("Device {} is not reachable", deviceId);
             log.debug("  error details", e);
