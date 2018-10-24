@@ -44,6 +44,15 @@
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.53</version>
+        </dependency>
+
     </dependencies>
+
+
 
 </project>
