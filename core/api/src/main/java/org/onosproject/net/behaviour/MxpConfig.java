@@ -98,10 +98,10 @@ public interface MxpConfig extends HandlerBehaviour {
 
 
     /**
-     * Descubre el vecino.
+     * Rpc para aplicar configuracion en el MXP
      *
      * @return response string
      */
-    //String neighborDiscovery();
+    String rpcApplyConfig();
 
 }

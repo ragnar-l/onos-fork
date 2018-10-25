@@ -454,9 +454,9 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
         return reply;
     }
 
-    /*
+
     @Override
-    public String neighborDiscovery() {
+    public String rpcApplyConfig() {
         DriverHandler handler = handler();
         NetconfController controller = handler.get(NetconfController.class);
         MastershipService mastershipService = handler.get(MastershipService.class);
@@ -473,23 +473,18 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
 
 
         try {
-            StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
-            request.append("<deviceneighbors/>");
-            request.append("</mux-config>");
-            request.append("<mux-state xmlns=\"http://fulgor.com/ns/cli-mxp\">");
-            request.append("<xfp_rx_power/>");
-            request.append("</mux-state>");
+            StringBuilder request = new StringBuilder("<mux-apply-config xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
 
             reply = controller
                     .getDevicesMap()
                     .get(ncDeviceId)
                     .getSession()
-                    .get(request.toString(), REPORT_ALL);
+                    .doWrappedRpc(request.toString(), REPORT_ALL);
         } catch (NetconfException e) {
             log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
         }
         return reply;
-    } */
+    }
 
 
 
