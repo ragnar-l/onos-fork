@@ -479,7 +479,7 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
                     .getDevicesMap()
                     .get(ncDeviceId)
                     .getSession()
-                    .doWrappedRpc(request.toString(), REPORT_ALL);
+                    .doWrappedRpc(request.toString());
         } catch (NetconfException e) {
             log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
         }
