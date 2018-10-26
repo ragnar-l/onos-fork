@@ -38,8 +38,7 @@
 
         <behaviour api="org.onosproject.drivers.fujitsu.behaviour.VoltNniLinkConfig"
                    impl="org.onosproject.drivers.fujitsu.FujitsuVoltNniLinkConfig"/>
-        <behaviour api="org.onosproject.incubator.net.faultmanagement.alarm.AlarmConsumer"
-                   impl="org.onosproject.drivers.fujitsu.FujitsuVoltAlarmConsumer"/>
+
 
 
         <behaviour api="org.onosproject.net.behaviour.LinkDiscovery"

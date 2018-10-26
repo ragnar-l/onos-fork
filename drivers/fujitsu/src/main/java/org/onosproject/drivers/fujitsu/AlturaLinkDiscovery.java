@@ -41,12 +41,6 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
     public Set<LinkDescription> getLinks() {
 
 
-
-        log.info("ENTRO A LinkDiscovery");
-
-
-
-
         DriverHandler handler = handler();
         NetconfController controller = handler.get(NetconfController.class);
         MastershipService mastershipService = handler.get(MastershipService.class);
