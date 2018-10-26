@@ -31,14 +31,13 @@
 
         <behaviour api="org.onosproject.drivers.fujitsu.behaviour.VoltOnuOperConfig"
                    impl="org.onosproject.drivers.fujitsu.FujitsuVoltOnuOperConfig"/>
-        <behaviour api="org.onosproject.drivers.fujitsu.behaviour.VoltAlertConfig"
-                   impl="org.onosproject.drivers.fujitsu.FujitsuVoltAlertConfig"/>
+        
         <behaviour api="org.onosproject.drivers.fujitsu.behaviour.VoltFwdlConfig"
                    impl="org.onosproject.drivers.fujitsu.FujitsuVoltFwdlConfig"/>
 
         <behaviour api="org.onosproject.drivers.fujitsu.behaviour.VoltNniLinkConfig"
                    impl="org.onosproject.drivers.fujitsu.FujitsuVoltNniLinkConfig"/>
-        
+
 
 
         <behaviour api="org.onosproject.net.behaviour.LinkDiscovery"
