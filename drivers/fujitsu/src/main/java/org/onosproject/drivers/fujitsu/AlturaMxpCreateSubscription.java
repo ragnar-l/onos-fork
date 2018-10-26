@@ -16,18 +16,18 @@
 
 package org.onosproject.drivers.fujitsu;
 
-        import org.onosproject.net.behaviour.MxpSubscription;
-        import org.onosproject.mastership.MastershipService;
-        import org.onosproject.net.DeviceId;
-        import org.onosproject.net.driver.AbstractHandlerBehaviour;
-        import org.onosproject.net.driver.DriverHandler;
-        import org.onosproject.netconf.NetconfController;
-        import org.onosproject.netconf.NetconfException;
-        import org.slf4j.Logger;
+import org.onosproject.net.behaviour.MxpSubscription;
+import org.onosproject.mastership.MastershipService;
+import org.onosproject.net.DeviceId;
+import org.onosproject.net.driver.AbstractHandlerBehaviour;
+import org.onosproject.net.driver.DriverHandler;
+import org.onosproject.netconf.NetconfController;
+import org.onosproject.netconf.NetconfException;
+import org.slf4j.Logger;
 
-        import static com.google.common.base.Preconditions.checkNotNull;
-        import static org.onosproject.drivers.fujitsu.FujitsuVoltXmlUtility.*;
-        import static org.slf4j.LoggerFactory.getLogger;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Implementation to get all available data in vOLT

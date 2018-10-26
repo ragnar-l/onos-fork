@@ -17,7 +17,7 @@ import org.onosproject.net.link.LinkDescription;
 import org.onosproject.net.Port;
 import org.slf4j.Logger;
 
-import static org.onosproject.drivers.fujitsu.FujitsuVoltXmlUtility.REPORT_ALL;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import org.onosproject.net.device.DeviceService;
 import com.google.common.collect.Iterables;
@@ -72,7 +72,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                     .getDevicesMap()
                     .get(ncDeviceId)
                     .getSession()
-                    .get(request.toString(), REPORT_ALL);
+                    .get(request.toString());
         } catch (NetconfException e) {
             log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
         }
