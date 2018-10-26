@@ -24,6 +24,16 @@ import org.onosproject.net.driver.HandlerBehaviour;
 @Beta
 public interface MxpConfig extends HandlerBehaviour {
 
+
+    /**
+     * Obtain all ONUs or a specific ONU in the device.
+     *
+     * @param target input data in string
+     * @return response string
+     */
+    String getOnus(String target);
+
+
     /**
      * Setea un tipo de trafico en el dispositivo.
      *
