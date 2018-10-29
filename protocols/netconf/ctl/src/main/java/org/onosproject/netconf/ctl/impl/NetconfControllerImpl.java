@@ -73,7 +73,7 @@ public class NetconfControllerImpl implements NetconfController {
 
     private static final String ETHZ_SSH2 = "ethz-ssh2";
 
-    protected static final int DEFAULT_CONNECT_TIMEOUT_SECONDS = 5;
+    protected static final int DEFAULT_CONNECT_TIMEOUT_SECONDS = 100;
     private static final String PROP_NETCONF_CONNECT_TIMEOUT = "netconfConnectTimeout";
     // FIXME @Property should not be static
     @Property(name = PROP_NETCONF_CONNECT_TIMEOUT, intValue = DEFAULT_CONNECT_TIMEOUT_SECONDS,
@@ -81,7 +81,7 @@ public class NetconfControllerImpl implements NetconfController {
     protected static int netconfConnectTimeout = DEFAULT_CONNECT_TIMEOUT_SECONDS;
 
     private static final String PROP_NETCONF_REPLY_TIMEOUT = "netconfReplyTimeout";
-    protected static final int DEFAULT_REPLY_TIMEOUT_SECONDS = 5;
+    protected static final int DEFAULT_REPLY_TIMEOUT_SECONDS = 120;
     // FIXME @Property should not be static
     @Property(name = PROP_NETCONF_REPLY_TIMEOUT, intValue = DEFAULT_REPLY_TIMEOUT_SECONDS,
             label = "Time (in seconds) waiting for a NetConf reply")
