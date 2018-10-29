@@ -98,7 +98,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                 }
             }
         }
-        catch (NullPointerException e){
+        catch (Exception e){
             log.info("ERROR EN LINK DISCOVERY");
         }
 
