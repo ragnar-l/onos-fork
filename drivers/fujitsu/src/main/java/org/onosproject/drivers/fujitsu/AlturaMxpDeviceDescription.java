@@ -97,7 +97,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         if (!(prueb>10)) {
             log.info("NO ESTA ACTIVO");
             try {
-                Thread.sleep((10-prueb)*1000);
+                Thread.sleep((13-prueb)*1000);
             }
             catch (Exception e){
 
