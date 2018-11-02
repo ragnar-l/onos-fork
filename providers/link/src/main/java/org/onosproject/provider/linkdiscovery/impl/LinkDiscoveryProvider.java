@@ -194,7 +194,6 @@ public class LinkDiscoveryProvider extends AbstractProvider
     }
 
     private void discoverLinksTasks() {
-        log.info("ENTRE A discoverLinksTasks");
         deviceService.getAvailableDevices().forEach(device -> {
             if (isSupported(device)) {
                 evaluateLinks(device.id(), device.as(LinkDiscovery.class).getLinks());

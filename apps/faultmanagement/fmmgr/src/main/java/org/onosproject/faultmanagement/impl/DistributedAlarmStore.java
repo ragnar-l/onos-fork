@@ -121,7 +121,7 @@ public class DistributedAlarmStore
             log.info("Received identical alarm, no operation needed on {}", alarm.id());
         } else {
             if ( alarm.description().contains("[--]") && alarm.description().contains("mux-notify xmlns")) {
-                log.info("SI CONTIENE");
+                log.info("Actualizando alarma {}", alarm.id());
                 try {
                     alarms.remove(alarm.id());
                 }
