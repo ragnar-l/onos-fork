@@ -55,6 +55,16 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
             return null;
         }
 
+        Device prueba = getDevice(ncDeviceId);
+
+        if (prueba.swVersion().equals("1.0")) {
+            log.info("SON IGUALES");
+        }
+        else{
+            log.info("NO SON IGUALES");
+            return null;
+        }
+
         Set<LinkDescription> descs = new HashSet<>();
 
         try {
