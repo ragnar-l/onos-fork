@@ -54,7 +54,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                     mastershipService.getMasterFor(ncDeviceId));
             return null;
         }
-        
+
         DeviceService deviceService = this.handler().get(DeviceService.class);
 
         Device prueba = deviceService.getDevice(ncDeviceId);
@@ -98,7 +98,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                 input -> input.serialNumber().equals(vecino));
         if (!dev.isPresent()) {
             log.info("Device with chassis ID {} does not exist");
-            return null;
+            return descs;
         }
 
         AlarmService alarmService = this.handler().get(AlarmService.class);
@@ -106,7 +106,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         try {
             for ( Alarm a : alarmService.getAlarms(localDeviceId)) {
                 if ( (a.id().toString().contains("RXS")) || (a.id().toString().contains("Rx LOCK ERR")) ) {
-                    return null;
+                    return descs;
                 }
             }
         }
