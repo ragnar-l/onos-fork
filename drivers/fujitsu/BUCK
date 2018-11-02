@@ -7,6 +7,7 @@ COMPILE_DEPS = [
     '//cli:onos-cli',
     '//apps/optical-model:onos-apps-optical-model',
     '//incubator/api:onos-incubator-api',
+    '//core/net:onos-core-net',
 ]
 
 TEST_DEPS = [
