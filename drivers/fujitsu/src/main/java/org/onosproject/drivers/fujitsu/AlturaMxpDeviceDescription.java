@@ -93,7 +93,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
             return null;
         }
 
-        if (!Integer.parseInt(devicecontroller.localStatus(deviceId).substring(9,11))>10) {
+        if (!(Integer.parseInt(devicecontroller.localStatus(deviceId).substring(9,11))>10)) {
             log.info("NO ESTA ACTIVO");
             return null;
         }
