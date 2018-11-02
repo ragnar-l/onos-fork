@@ -56,16 +56,16 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         }
 
         DeviceService deviceService = this.handler().get(DeviceService.class);
+        Device localdevice = deviceService.getDevice(ncDeviceId);
 
-        Device prueba = deviceService.getDevice(ncDeviceId);
-
-        if (prueba.swVersion().equals("1.0")) {
-            log.info("SON IGUALES");
+        if ( (localdevice.swVersion().equals("1.0")) && (localdevice.type().toString().equals("OTN")) ) {
+            log.debug("SON IGUALES");
         }
         else{
-            log.info("NO SON IGUALES");
+            log.debug("NO SON IGUALES");
             return null;
         }
+
 
         Set<LinkDescription> descs = new HashSet<>();
 
@@ -82,8 +82,6 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         } catch (NetconfException e) {
             log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
         }
-
-        log.info(reply);
 
 
         DeviceId localDeviceId = this.handler().data().deviceId();
@@ -110,12 +108,12 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                 }
             }
         }
+
         catch (Exception e){
-            log.info("ERROR EN LINK DISCOVERY");
+            log.info("LinkDiscovery ERROR - alarms");
         }
 
         Device remoteDevice = dev.get();
-
         Port remotePort = deviceService.getPorts(remoteDevice.id()).get(0);
 
         ConnectPoint local = new ConnectPoint(localDeviceId, localPort.number());
@@ -137,15 +135,5 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
     private static String serialNumber(String version) {
         String serialNumber = StringUtils.substringBetween(version, "<deviceneighbors>", "</deviceneighbors>");
         return serialNumber;
-    }
-
-    /**
-     * Retrieving potencia de recepcion de lado de linea of device.
-     * @param version the return of show version command
-     * @return potencia de recepcion de lado de linea of the device
-     */
-    private static String xfpRxPower(String version) {
-        String xfpRxPower = StringUtils.substringBetween(version, "<xfp_rx_power>", "</xfp_rx_power>");
-        return xfpRxPower;
     }
 }
