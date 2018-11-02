@@ -89,7 +89,6 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         }
         else{
             log.info("ESTA ACTIVO");
-            log.info(prueba);
         }
 
 
