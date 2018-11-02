@@ -54,8 +54,10 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                     mastershipService.getMasterFor(ncDeviceId));
             return null;
         }
+        
+        DeviceService deviceService = this.handler().get(DeviceService.class);
 
-        Device prueba = getDevice(ncDeviceId);
+        Device prueba = deviceService.getDevice(ncDeviceId);
 
         if (prueba.swVersion().equals("1.0")) {
             log.info("SON IGUALES");
@@ -83,7 +85,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
 
         log.info(reply);
 
-        DeviceService deviceService = this.handler().get(DeviceService.class);
+
         DeviceId localDeviceId = this.handler().data().deviceId();
         Port localPort = deviceService.getPorts(localDeviceId).get(0);
 
