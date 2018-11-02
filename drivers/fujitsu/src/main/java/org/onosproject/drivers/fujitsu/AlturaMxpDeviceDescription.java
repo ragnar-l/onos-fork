@@ -80,6 +80,8 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
 
         DeviceManager devicecontroller = checkNotNull(handler().get(DeviceManager.class));
 
+        devicecontroller.localStatus(controller.getDevicesMap().get(handler().data().deviceId()));
+
         NetconfDevice ncDevice = controller.getDevicesMap().get(handler().data().deviceId());
         if (ncDevice == null) {
             log.error("Internal ONOS Error. Device has been marked as reachable, " +
