@@ -86,7 +86,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                 input -> input.serialNumber().equals(vecino));
         if (!dev.isPresent()) {
             log.info("Device with chassis ID {} does not exist");
-            return descs;
+            return null;
         }
 
         AlarmService alarmService = this.handler().get(AlarmService.class);
@@ -94,7 +94,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         try {
             for ( Alarm a : alarmService.getAlarms(localDeviceId)) {
                 if ( (a.id().toString().contains("RXS")) || (a.id().toString().contains("Rx LOCK ERR")) ) {
-                    return descs;
+                    return null;
                 }
             }
         }
