@@ -74,7 +74,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
     public DeviceDescription discoverDeviceDetails() {
 
         NetconfController controller = checkNotNull(handler().get(NetconfController.class));
-        DeviceManager devservice = checkNotNull(handler().get(DeviceServiceAdapter.class));
+        DeviceManager devservice = checkNotNull(handler().get(DeviceManager.class));
         NetconfSession session = controller.getDevicesMap().get(handler().data().deviceId()).getSession();
 
 
