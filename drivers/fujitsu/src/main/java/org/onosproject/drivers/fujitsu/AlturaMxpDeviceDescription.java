@@ -96,7 +96,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         if (!(Integer.parseInt(devicecontroller.localStatus(deviceId).substring(10,11))>10)) {
             log.info("NO ESTA ACTIVO");
             try {
-                Thread.sleep(5000);
+                Thread.sleep(50000);
             }
             catch (Exception e){
 
