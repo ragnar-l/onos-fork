@@ -79,8 +79,10 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         NetconfSession session = controller.getDevicesMap().get(handler().data().deviceId()).getSession();
 
         DeviceManager devicecontroller = checkNotNull(handler().get(DeviceManager.class));
+        DeviceId deviceId = handler().data().deviceId();
+        devicecontroller.localStatus(deviceId);
 
-        devicecontroller.localStatus(controller.getDevicesMap().get(handler().data().deviceId()));
+        log.info(devicecontroller.localStatus(deviceId));
 
         NetconfDevice ncDevice = controller.getDevicesMap().get(handler().data().deviceId());
         if (ncDevice == null) {
@@ -133,7 +135,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
 
 
         DeviceService deviceService = checkNotNull(handler().get(DeviceService.class));
-        DeviceId deviceId = handler().data().deviceId();
+
         Device device = deviceService.getDevice(deviceId);
 
         return new DefaultDeviceDescription(device.id().uri(), Device.Type.OTN,
