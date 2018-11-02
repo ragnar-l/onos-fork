@@ -78,7 +78,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
 
         String prueba = session.getSessionId();
         if (prueba==null) {
-            log.info("ES NULL"):
+            log.info("ES NULL");
         }
         else{
             log.info("NO ES NULLLL");
