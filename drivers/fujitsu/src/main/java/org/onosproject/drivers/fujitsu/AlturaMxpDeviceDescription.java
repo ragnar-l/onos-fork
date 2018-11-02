@@ -60,6 +60,7 @@ import org.onosproject.net.device.DefaultDeviceDescription;
 import org.onosproject.net.device.DeviceService;
 
 import org.apache.commons.lang.StringUtils;
+import org.onosproject.netconf.NetconfDevice;
 
 /**
  * Retrieves the ports (sin informacion por ahora - que puertos?) from a Altura MXP40gb device via netconf.
@@ -75,13 +76,19 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         NetconfController controller = checkNotNull(handler().get(NetconfController.class));
         NetconfSession session = controller.getDevicesMap().get(handler().data().deviceId()).getSession();
 
+        NetconfDevice ncDevice = controller.getDevicesMap().get(handler().data().deviceId());
+        if (ncDevice == null) {
+            log.error("Internal ONOS Error. Device has been marked as reachable, " +
+                            "but deviceID {} is not in Devices Map. Continuing with empty description",
+                    handler().data().deviceId());
+            return null;
+        }
 
-        String prueba = session.getSessionId();
-        if (prueba==null) {
-            log.info("ES NULL");
+        if (!ncDevice.isActive()) {
+            log.info("NO ESTA ACTIVO");
         }
         else{
-            log.info("NO ES NULLLL");
+            log.info("ESTA ACTIVO");
             log.info(prueba);
         }
 
