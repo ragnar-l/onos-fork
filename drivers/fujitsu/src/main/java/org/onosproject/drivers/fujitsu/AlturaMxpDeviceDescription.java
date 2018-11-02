@@ -83,7 +83,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         devicecontroller.localStatus(deviceId);
 
         log.info("HOLAAAA");
-        log.info(devicecontroller.localStatus(deviceId).substring(11,11));
+        log.info(devicecontroller.localStatus(deviceId).substring(10,12));
 
         NetconfDevice ncDevice = controller.getDevicesMap().get(handler().data().deviceId());
         if (ncDevice == null) {
@@ -93,7 +93,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
             return null;
         }
 
-        if (!(Integer.parseInt(devicecontroller.localStatus(deviceId).substring(9,11))>10)) {
+        if (!(Integer.parseInt(devicecontroller.localStatus(deviceId).substring(10,11))>10)) {
             log.info("NO ESTA ACTIVO");
             return null;
         }
