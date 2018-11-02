@@ -62,7 +62,7 @@ import org.onosproject.net.device.DeviceService;
 import org.apache.commons.lang.StringUtils;
 import org.onosproject.netconf.NetconfDevice;
 
-import org.onosproject.net.device.impl.DeviceManager;
+import org.onosproject.net.device.DeviceService;
 
 /**
  * Retrieves the ports (sin informacion por ahora - que puertos?) from a Altura MXP40gb device via netconf.
@@ -78,7 +78,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         NetconfController controller = checkNotNull(handler().get(NetconfController.class));
         NetconfSession session = controller.getDevicesMap().get(handler().data().deviceId()).getSession();
 
-        DeviceManager devicecontroller = checkNotNull(handler().get(DeviceManager.class));
+        DeviceService devicecontroller = checkNotNull(handler().get(DeviceService.class));
         DeviceId deviceId = handler().data().deviceId();
         devicecontroller.localStatus(deviceId);
 
