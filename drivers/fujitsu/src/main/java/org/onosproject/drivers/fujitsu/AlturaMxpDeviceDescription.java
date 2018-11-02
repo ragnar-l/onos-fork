@@ -58,6 +58,7 @@ import org.onosproject.net.Device;
 import org.onosproject.net.DeviceId;
 import org.onosproject.net.device.DefaultDeviceDescription;
 import org.onosproject.net.device.DeviceService;
+import org.onosproject.net.device.DeviceServiceAdapter;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -73,12 +74,13 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
     public DeviceDescription discoverDeviceDetails() {
 
         NetconfController controller = checkNotNull(handler().get(NetconfController.class));
+        DeviceServiceAdapter devservice = checkNotNull(handler().get(DeviceServiceAdapter.class));
         NetconfSession session = controller.getDevicesMap().get(handler().data().deviceId()).getSession();
 
 
-        String prueba = localStatus(controller.getDevicesMap().get(handler().data().deviceId()));
+        String prueba = devservice.localStatus(controller.getDevicesMap().get(handler().data().deviceId()));
         log.info(prueba);
-        
+
         StringBuilder request = new StringBuilder("<get>");
         request.append("<filter type=\"subtree\">");
         request.append("<mux-state xmlns=\"http://fulgor.com/ns/cli-mxp\">");
