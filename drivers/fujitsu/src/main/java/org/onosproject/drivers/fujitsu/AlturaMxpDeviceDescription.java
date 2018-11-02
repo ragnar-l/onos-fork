@@ -62,7 +62,7 @@ import org.onosproject.net.device.DeviceService;
 import org.apache.commons.lang.StringUtils;
 import org.onosproject.netconf.NetconfDevice;
 
-import org.onosproject.net.device.DeviceManager;
+import org.onosproject.net.device.impl.DeviceManager;
 
 /**
  * Retrieves the ports (sin informacion por ahora - que puertos?) from a Altura MXP40gb device via netconf.
