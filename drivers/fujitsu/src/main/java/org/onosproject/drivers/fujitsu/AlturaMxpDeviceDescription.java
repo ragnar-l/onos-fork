@@ -74,6 +74,11 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
 
         NetconfController controller = checkNotNull(handler().get(NetconfController.class));
         NetconfSession session = controller.getDevicesMap().get(handler().data().deviceId()).getSession();
+
+
+        String prueba = localStatus(controller.getDevicesMap().get(handler().data().deviceId()));
+        log.info(prueba);
+        
         StringBuilder request = new StringBuilder("<get>");
         request.append("<filter type=\"subtree\">");
         request.append("<mux-state xmlns=\"http://fulgor.com/ns/cli-mxp\">");
