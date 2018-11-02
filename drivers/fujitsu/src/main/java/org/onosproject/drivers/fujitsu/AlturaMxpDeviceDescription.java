@@ -83,7 +83,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         devicecontroller.localStatus(deviceId);
 
         log.info("HOLAAAA");
-        log.info(devicecontroller.localStatus(deviceId).substring(10,11));
+        log.info(devicecontroller.localStatus(deviceId).substring(11,11));
 
         NetconfDevice ncDevice = controller.getDevicesMap().get(handler().data().deviceId());
         if (ncDevice == null) {
