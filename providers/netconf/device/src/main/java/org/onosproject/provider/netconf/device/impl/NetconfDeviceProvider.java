@@ -413,7 +413,6 @@ public class NetconfDeviceProvider extends AbstractProvider
             providerService.deviceDisconnected(deviceId);
             return;
         } else if (newlyConnected) {
-            log.info("NUEVAMENTE CONECTADO");
             updateDeviceDescription(deviceId, deviceDescription, device);
         }
         if (isReachable && deviceService.isAvailable(deviceId) &&
@@ -432,6 +431,7 @@ public class NetconfDeviceProvider extends AbstractProvider
             if (mastershipService.isLocalMaster(deviceId)) {
                 DeviceDescriptionDiscovery deviceDescriptionDiscovery =
                         device.as(DeviceDescriptionDiscovery.class);
+                log.info("PRUEBAAAAAAAAA");
                 DeviceDescription updatedDeviceDescription =
                         deviceDescriptionDiscovery.discoverDeviceDetails();
                 if (updatedDeviceDescription != null &&

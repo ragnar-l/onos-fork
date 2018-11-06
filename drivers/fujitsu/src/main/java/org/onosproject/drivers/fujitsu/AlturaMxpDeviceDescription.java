@@ -130,8 +130,6 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         StringBuilder suscribe = new StringBuilder("<create-subscription xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\"/>");
         try {
             version = session.doWrappedRpc(suscribe.toString());
-            log.info("RESPUESTA");
-            log.info(version);
         } catch (NetconfException e) {
             throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
         }
