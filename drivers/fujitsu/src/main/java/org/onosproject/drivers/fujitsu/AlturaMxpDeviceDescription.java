@@ -92,22 +92,14 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
             return null;
         }
 
-        while(!devicecapabilities.toString().contains("http://fulgor.com/ns/cli-mxp?module=cli-mxp")){
-            log.info("No encontro modulo fulgor.");
-            try {
-                Thread.sleep(5000);
-            }
-            catch (Exception e){
-                log.info("Excepcion al dormir hilo");
-            }
-        }
 
-        try {
-            Thread.sleep(5000);
-        }
-        catch (Exception e){
-            log.info("Excepcion al dormir hilo");
-        }
+
+        //try {
+        //    Thread.sleep(5000);
+        //}
+        //catch (Exception e){
+        //    log.info("Excepcion al dormir hilo");
+        //}
 
 
         StringBuilder request = new StringBuilder("<get>");
@@ -125,7 +117,8 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         try {
             version = session.doWrappedRpc(request.toString());
         } catch (Exception e) {
-            throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
+            log.info("excepcion");
+            //throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
         }
         log.info("Se rompe despues");
         String[] details = new String[4];
