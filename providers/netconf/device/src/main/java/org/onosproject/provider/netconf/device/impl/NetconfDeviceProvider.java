@@ -431,12 +431,8 @@ public class NetconfDeviceProvider extends AbstractProvider
             if (mastershipService.isLocalMaster(deviceId)) {
                 DeviceDescriptionDiscovery deviceDescriptionDiscovery =
                         device.as(DeviceDescriptionDiscovery.class);
-
                 DeviceDescription updatedDeviceDescription =
                         deviceDescriptionDiscovery.discoverDeviceDetails();
-                if(updatedDeviceDescription==null){
-                    log.info("PRUEBAAAAAAAAA");
-                }
                 if (updatedDeviceDescription != null &&
                         !descriptionEquals(device, updatedDeviceDescription)) {
                     providerService.deviceConnected(

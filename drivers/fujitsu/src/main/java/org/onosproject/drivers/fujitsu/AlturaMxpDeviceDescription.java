@@ -91,15 +91,14 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
                     handler().data().deviceId());
             return null;
         }
-
-
-
-        //try {
-        //    Thread.sleep(5000);
-        //}
-        //catch (Exception e){
-        //    log.info("Excepcion al dormir hilo");
-        //}
+        
+        try {
+            Thread.sleep(15000);
+        }
+        catch (Exception e){
+            log.info("Excepcion al dormir hilo");
+            throw new IllegalStateException(new Exception("Error al dormir hilo.", e));
+        }
 
 
         StringBuilder request = new StringBuilder("<get>");
@@ -118,7 +117,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
             version = session.doWrappedRpc(request.toString());
         } catch (Exception e) {
             log.info("excepcion");
-            //throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
+            throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
         }
         log.info("Se rompe despues");
         String[] details = new String[4];
@@ -131,6 +130,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         try {
             version = session.doWrappedRpc(suscribe.toString());
         } catch (NetconfException e) {
+            log.info("excepcion");
             throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
         }
 
