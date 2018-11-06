@@ -96,6 +96,13 @@ public interface MxpConfig extends HandlerBehaviour {
      */
     String setValueRxPowerNotify(String value_rx_power_notify_config);
 
+    /**
+     * Setea el valor del rx_power a notificar. (umbral)
+     *
+     * @param value_rx_power_notify_config time data in string
+     * @return response string
+     */
+    String setDeviceNeighbors(String deviceneighbors);
 
     /**
      * Rpc para aplicar configuracion en el MXP

@@ -132,7 +132,8 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
      * @param version the return of show version command
      * @return the serial number of the device
      */
-    private static String serialNumber(String version) {
+    private String serialNumber(String version) {
+        log.info(version);
         String serialNumber = StringUtils.substringBetween(version, "<deviceneighbors>", "</deviceneighbors>");
         return serialNumber;
     }

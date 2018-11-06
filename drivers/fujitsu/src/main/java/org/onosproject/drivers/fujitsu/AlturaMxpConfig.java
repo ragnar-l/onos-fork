@@ -454,6 +454,49 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
         return reply;
     }
 
+    @Override
+    public String setDeviceNeighbors(String deviceneighbors) {
+        DriverHandler handler = handler();
+        NetconfController controller = handler.get(NetconfController.class);
+        MastershipService mastershipService = handler.get(MastershipService.class);
+        DeviceId ncDeviceId = handler.data().deviceId();
+        checkNotNull(controller, "Netconf controller is null");
+        String reply = null;
+
+        if (!mastershipService.isLocalMaster(ncDeviceId)) {
+            log.warn("Not master for {} Use {} to execute command",
+                    ncDeviceId,
+                    mastershipService.getMasterFor(ncDeviceId));
+            return null;
+        }
+
+
+        try {
+            StringBuilder request = new StringBuilder("<edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">");
+            request.append("<target>");
+            request.append("<running/>");
+            request.append("</target>");
+            request.append("<default-operation>merge</default-operation>");
+            request.append("<test-option>set</test-option>");
+            request.append("<config>");
+            request.append("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+            request.append("<deviceneighbors xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" nc:operation=\"replace\">");
+            request.append(deviceneighbors);
+            request.append("</deviceneighbors>");
+            request.append("</mux-config>");
+            request.append("</config>");
+            request.append("</edit-config>");
+
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .doWrappedRpc(request.toString());
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+        return reply;
+    }
 
     @Override
     public String rpcApplyConfig() {

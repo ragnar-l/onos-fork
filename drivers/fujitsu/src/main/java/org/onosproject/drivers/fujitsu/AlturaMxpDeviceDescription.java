@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -63,7 +64,7 @@ import org.apache.commons.lang.StringUtils;
 import org.onosproject.netconf.NetconfDevice;
 
 import org.onosproject.net.device.DeviceService;
-
+import org.onosproject.netconf.ctl.impl.NetconfSessionMinaImpl;
 /**
  * Retrieves the ports (sin informacion por ahora - que puertos?) from a Altura MXP40gb device via netconf.
  */
@@ -82,7 +83,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         DeviceId deviceId = handler().data().deviceId();
         devicecontroller.localStatus(deviceId);
 
-        log.info("HOLAAAA");
+
         log.info(devicecontroller.localStatus(deviceId).substring(10,11));
 
         NetconfDevice ncDevice = controller.getDevicesMap().get(handler().data().deviceId());
@@ -93,18 +94,25 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
             return null;
         }
 
-        int prueb=Integer.parseInt(devicecontroller.localStatus(deviceId).substring(10,11));
-        if (!(prueb>10)) {
-            log.info("NO ESTA ACTIVO");
+        Set<String> devicecapabilities = session.getDeviceCapabilitiesSet();
+        /*
+        while(!devicecapabilities.toString().contains("http://fulgor.com/ns/cli-mxp?module=cli-mxp")){
+            log.info("No encontro modulo fulgor.");
             try {
-                Thread.sleep((13-prueb)*1000);
+                Thread.sleep(500);
             }
             catch (Exception e){
-
+                log.info("Excepcion al dormir hilo");
             }
         }
-        else{
-            log.info("ESTA ACTIVO");
+
+        */
+
+        try {
+            Thread.sleep(15000);
+        }
+        catch (Exception e){
+            log.info("Excepcion al dormir hilo");
         }
 
 
@@ -122,7 +130,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         String version = null;
         try {
             version = session.doWrappedRpc(request.toString());
-        } catch (NetconfException e) {
+        } catch (Exception e) {
             throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
         }
 
