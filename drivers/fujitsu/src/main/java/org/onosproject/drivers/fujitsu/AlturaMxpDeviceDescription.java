@@ -84,8 +84,6 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         devicecontroller.localStatus(deviceId);
 
 
-        log.info(devicecontroller.localStatus(deviceId).substring(10,11));
-
         NetconfDevice ncDevice = controller.getDevicesMap().get(handler().data().deviceId());
         if (ncDevice == null) {
             log.error("Internal ONOS Error. Device has been marked as reachable, " +
@@ -94,22 +92,18 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
             return null;
         }
 
-        Set<String> devicecapabilities = session.getDeviceCapabilitiesSet();
-        /*
         while(!devicecapabilities.toString().contains("http://fulgor.com/ns/cli-mxp?module=cli-mxp")){
             log.info("No encontro modulo fulgor.");
             try {
-                Thread.sleep(500);
+                Thread.sleep(5000);
             }
             catch (Exception e){
                 log.info("Excepcion al dormir hilo");
             }
         }
 
-        */
-
         try {
-            Thread.sleep(15000);
+            Thread.sleep(5000);
         }
         catch (Exception e){
             log.info("Excepcion al dormir hilo");
@@ -133,7 +127,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         } catch (Exception e) {
             throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
         }
-
+        log.info("Se rompe despues");
         String[] details = new String[4];
         details[0] = getManufacturer(version);
         details[1] = getHwVersion(version);

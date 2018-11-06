@@ -63,6 +63,7 @@ public class AlturaMxpGetAll extends AbstractHandlerBehaviour
             request.append("<mux-state-power xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
             request.append("<mux-state-dsp xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
             request.append("<mux-state-edfa xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
+            request.append("<mux-state-temp-hum xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
 
 
             reply = controller
