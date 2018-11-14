@@ -15,8 +15,6 @@
   ~ limitations under the License.
   -->
 <drivers>
-    <!-- T100 supports 96 (50 GHz) or 128 (37.5 GHz) C-band channels,
-     although this driver only enables 80 50 GHz channels. -->
     <driver name="altura-netconf">
         <behaviour api="org.onosproject.net.optical.OpticalDevice"
                    impl="org.onosproject.net.optical.DefaultOpticalDevice"/>
@@ -53,6 +51,9 @@
 
         <behaviour api="org.onosproject.net.device.DeviceDescriptionDiscovery"
                    impl="org.onosproject.drivers.fujitsu.AlturaMxpDeviceDescription"/>
+
+        <behaviour api="org.onosproject.net.behaviour.LinkDiscovery"
+                   impl="org.onosproject.drivers.fujitsu.AlturaLinkDiscovery"/>
 
     </driver>
 </drivers>
