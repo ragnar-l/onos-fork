@@ -58,6 +58,12 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         DeviceService deviceService = this.handler().get(DeviceService.class);
         Device localdevice = deviceService.getDevice(ncDeviceId);
 
+        /**
+         * Tengo que esperar hasta que el dispositivo se conecte con ONOS.
+         * Una vez se conecte, ONOS consulta por la descripcion del dispositivo. Si el mismo es OTN, puedo seguir en getLinks.
+         * De lo contrario, retorno null.
+         */
+
         if ( (localdevice.swVersion().equals("1.0")) && (localdevice.type().toString().equals("OTN")) ) {
             log.debug("SON IGUALES");
         }
@@ -67,6 +73,9 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         }
 
 
+        /**
+         * Pregunto al dispositivo local quien es su vecino.
+         */
         Set<LinkDescription> descs = new HashSet<>();
 
         try {
@@ -90,7 +99,9 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         String vecino = serialNumber(reply);
 
 
-        //find destination device by remote serial number id
+        /**
+         * Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
+         */
         com.google.common.base.Optional<Device> dev = Iterables.tryFind(
                 deviceService.getAvailableDevices(),
                 input -> input.serialNumber().equals(vecino));
@@ -99,8 +110,12 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
             return descs;
         }
 
-        AlarmService alarmService = this.handler().get(AlarmService.class);
 
+        /**
+         * Tengo que ver si el dispositivo local tiene alarmas referidas al enlace.
+         * Si las tiene, no armo enlace.
+         */
+        AlarmService alarmService = this.handler().get(AlarmService.class);
         try {
             for ( Alarm a : alarmService.getAlarms(localDeviceId)) {
                 if ( (a.id().toString().contains("RXS")) || (a.id().toString().contains("Rx LOCK ERR")) ) {
@@ -114,15 +129,16 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         }
 
         Device remoteDevice = dev.get();
-        Port remotePort = deviceService.getPorts(remoteDevice.id()).get(0);
+        Port remotePort = deviceService.getPorts(remoteDevice.id()).get(0); // el puerto con el que formo el enlace vecino.
 
         ConnectPoint local = new ConnectPoint(localDeviceId, localPort.number());
         ConnectPoint remote = new ConnectPoint(remoteDevice.id(), remotePort.number());
-        DefaultAnnotations annotations = DefaultAnnotations.builder()
-                .set("layer", "IP")
-                .build();
+
+        DefaultAnnotations annotations = DefaultAnnotations.builder().set("layer", "IP").build();
+
         descs.add(new DefaultLinkDescription(
                 local, remote, Link.Type.OPTICAL, false, annotations));
+
         return descs;
     }
 

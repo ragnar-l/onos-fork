@@ -22,30 +22,6 @@
         <behaviour api="org.onosproject.net.behaviour.LambdaQuery"
                    impl="org.onosproject.driver.optical.query.CBand50LambdaQuery"/>
 
-        <behaviour api="org.onosproject.net.behaviour.ControllerConfig"
-                   impl="org.onosproject.drivers.fujitsu.FujitsuVoltControllerConfig"/>
-
-        <behaviour api="org.onosproject.drivers.fujitsu.behaviour.VoltPonLinkConfig"
-                   impl="org.onosproject.drivers.fujitsu.FujitsuVoltPonLinkConfig"/>
-
-        <behaviour api="org.onosproject.drivers.fujitsu.behaviour.VoltOnuConfig"
-                   impl="org.onosproject.drivers.fujitsu.FujitsuVoltOnuConfig"/>
-
-        <behaviour api="org.onosproject.drivers.fujitsu.behaviour.VoltOnuOperConfig"
-                   impl="org.onosproject.drivers.fujitsu.FujitsuVoltOnuOperConfig"/>
-
-        <behaviour api="org.onosproject.drivers.fujitsu.behaviour.VoltAlertConfig"
-                   impl="org.onosproject.drivers.fujitsu.FujitsuVoltAlertConfig"/>
-
-        <behaviour api="org.onosproject.drivers.fujitsu.behaviour.VoltFwdlConfig"
-                   impl="org.onosproject.drivers.fujitsu.FujitsuVoltFwdlConfig"/>
-
-        <behaviour api="org.onosproject.drivers.fujitsu.behaviour.VoltNeConfig"
-                   impl="org.onosproject.drivers.fujitsu.FujitsuVoltNeConfig"/>
-
-        <behaviour api="org.onosproject.drivers.fujitsu.behaviour.VoltNniLinkConfig"
-                   impl="org.onosproject.drivers.fujitsu.FujitsuVoltNniLinkConfig"/>
-
         <behaviour api="org.onosproject.drivers.fujitsu.behaviour.MxpGetAll"
                    impl="org.onosproject.drivers.fujitsu.AlturaMxpGetAll"/>
 

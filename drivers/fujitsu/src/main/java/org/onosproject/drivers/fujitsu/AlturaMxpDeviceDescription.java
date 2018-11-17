@@ -65,8 +65,9 @@ import org.onosproject.netconf.NetconfDevice;
 
 import org.onosproject.net.device.DeviceService;
 import org.onosproject.netconf.ctl.impl.NetconfSessionMinaImpl;
+
 /**
- * Retrieves the ports (sin informacion por ahora - que puertos?) from a Altura MXP40gb device via netconf.
+ * Retrieves the ports (que puertos?) from a Altura MXP40gb device via netconf.
  */
 public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         implements DeviceDescriptionDiscovery {
@@ -81,8 +82,6 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
 
         DeviceService devicecontroller = checkNotNull(handler().get(DeviceService.class));
         DeviceId deviceId = handler().data().deviceId();
-        devicecontroller.localStatus(deviceId);
-
 
         NetconfDevice ncDevice = controller.getDevicesMap().get(handler().data().deviceId());
         if (ncDevice == null) {
@@ -92,13 +91,29 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
             return null;
         }
 
-        try {
-            Thread.sleep(15000);
+
+        /**
+         * Lo primero que hago es ver el tiempo que paso desde que se conecto el dispositivo.
+         * El mismo, debe ser mayor a 30 segundos para dar tiempo al mxp a conectarse correctamente con onos.
+         */
+
+        /*
+        String tiempo_conectado = devicecontroller.localStatus(deviceId); //obtengo tiempo transcurrido en string
+        tiempo_conectado = tiempo_conectado.replaceAll("\\D+",""); //obtengo solo la info en enteros del tiempo transcurrido
+        if(tiempo_conectado.equals("")){
+            tiempo_conectado="0"; //si no tiene info, es 0
         }
-        catch (Exception e){
-            log.info("Excepcion al dormir hilo");
-            throw new IllegalStateException(new Exception("Error al dormir hilo.", e));
+        int tiempo_conectado_int = Integer.parseInt(tiempo_conectado); // casteo de String a int
+
+        while (tiempo_conectado_int<30) { //mientras que es menor a 30 segundos, repetir
+            tiempo_conectado = devicecontroller.localStatus(deviceId);
+            tiempo_conectado = tiempo_conectado.replaceAll("\\D+","");
+            if(tiempo_conectado.equals("")){
+                tiempo_conectado="0";
+            }
+            tiempo_conectado_int = Integer.parseInt(tiempo_conectado);
         }
+        */
 
 
         StringBuilder request = new StringBuilder("<get>");
@@ -112,39 +127,36 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         request.append("</filter>");
         request.append("</get>");
 
-        String version = null;
+        String info_device = null;
         try {
-            version = session.doWrappedRpc(request.toString());
-        } catch (Exception e) {
-            log.info("excepcion");
+            info_device = session.doWrappedRpc(request.toString());
+        } catch (NetconfException e) {
+            log.info("NetconfException en AlturaMxpDeviceDescription - Info device");
             throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
         }
-        log.info("Se rompe despues");
+
         String[] details = new String[4];
-        details[0] = getManufacturer(version);
-        details[1] = getHwVersion(version);
-        details[2] = getSwVersion(version);
-        details[3] = serialNumber(version);
+        details[0] = getManufacturer(info_device);
+        details[1] = getHwVersion(info_device);
+        details[2] = getSwVersion(info_device);
+        details[3] = serialNumber(info_device);
 
         StringBuilder suscribe = new StringBuilder("<create-subscription xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\"/>");
         try {
-            version = session.doWrappedRpc(suscribe.toString());
+            info_device = session.doWrappedRpc(suscribe.toString());
         } catch (NetconfException e) {
-            log.info("excepcion");
+            log.info("NetconfException en AlturaMxpDeviceDescription - Subscribe");
             throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
         }
 
 
         DeviceService deviceService = checkNotNull(handler().get(DeviceService.class));
 
-        Device device = deviceService.getDevice(deviceId);
-
-        return new DefaultDeviceDescription(device.id().uri(), Device.Type.OTN,
+        return new DefaultDeviceDescription(deviceId.uri(), Device.Type.OTN,
                 details[0], details[1],
                 details[2], details[3],
-                null);
+                null, DefaultAnnotations.EMPTY);
     }
-
 
 
     @Override
