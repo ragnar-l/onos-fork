@@ -62,7 +62,7 @@ import org.onosproject.net.device.DeviceService;
 
 import org.apache.commons.lang.StringUtils;
 import org.onosproject.netconf.NetconfDevice;
-
+import org.onlab.packet.ChassisId;
 import org.onosproject.net.device.DeviceService;
 import org.onosproject.netconf.ctl.impl.NetconfSessionMinaImpl;
 
@@ -96,8 +96,6 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
          * Lo primero que hago es ver el tiempo que paso desde que se conecto el dispositivo.
          * El mismo, debe ser mayor a 30 segundos para dar tiempo al mxp a conectarse correctamente con onos.
          */
-
-        /*
         String tiempo_conectado = devicecontroller.localStatus(deviceId); //obtengo tiempo transcurrido en string
         tiempo_conectado = tiempo_conectado.replaceAll("\\D+",""); //obtengo solo la info en enteros del tiempo transcurrido
         if(tiempo_conectado.equals("")){
@@ -113,7 +111,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
             }
             tiempo_conectado_int = Integer.parseInt(tiempo_conectado);
         }
-        */
+
 
 
         StringBuilder request = new StringBuilder("<get>");
@@ -149,13 +147,12 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
             throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
         }
 
-
-        DeviceService deviceService = checkNotNull(handler().get(DeviceService.class));
-
-        return new DefaultDeviceDescription(deviceId.uri(), Device.Type.OTN,
+        DeviceDescription defaultDescription = new DefaultDeviceDescription(deviceId.uri(), Device.Type.OTN,
                 details[0], details[1],
                 details[2], details[3],
-                null, DefaultAnnotations.EMPTY);
+                new ChassisId(), false, DefaultAnnotations.EMPTY);
+
+        return defaultDescription;
     }
 
 

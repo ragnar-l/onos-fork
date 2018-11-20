@@ -19,7 +19,7 @@ package org.onosproject.drivers.fujitsu;
 import com.google.common.collect.ImmutableSet;
 import org.onosproject.mastership.MastershipService;
 import org.onosproject.net.DeviceId;
-import org.onosproject.drivers.fujitsu.behaviour.MxpConfig;
+import org.onosproject.net.behaviour.MxpConfig;
 import org.onosproject.net.driver.AbstractHandlerBehaviour;
 import org.onosproject.net.driver.DriverHandler;
 import org.onosproject.netconf.NetconfController;

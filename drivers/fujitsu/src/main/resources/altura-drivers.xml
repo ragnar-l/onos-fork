@@ -22,16 +22,16 @@
         <behaviour api="org.onosproject.net.behaviour.LambdaQuery"
                    impl="org.onosproject.driver.optical.query.CBand50LambdaQuery"/>
 
-        <behaviour api="org.onosproject.drivers.fujitsu.behaviour.MxpGetAll"
+        <behaviour api="org.onosproject.net.behaviour.MxpGetAll"
                    impl="org.onosproject.drivers.fujitsu.AlturaMxpGetAll"/>
 
-        <behaviour api="org.onosproject.drivers.fujitsu.behaviour.MxpLoadModule"
+        <behaviour api="org.onosproject.net.behaviour.MxpLoadModule"
                    impl="org.onosproject.drivers.fujitsu.AlturaMxpLoadModule"/>
 
-        <behaviour api="org.onosproject.drivers.fujitsu.behaviour.MxpConfig"
+        <behaviour api="org.onosproject.net.behaviour.MxpConfig"
                    impl="org.onosproject.drivers.fujitsu.AlturaMxpConfig"/>
 
-        <behaviour api="org.onosproject.drivers.fujitsu.behaviour.MxpSubscription"
+        <behaviour api="org.onosproject.net.behaviour.MxpSubscription"
                    impl="org.onosproject.drivers.fujitsu.AlturaMxpCreateSubscription"/>
 
         <behaviour api="org.onosproject.net.device.DeviceDescriptionDiscovery"

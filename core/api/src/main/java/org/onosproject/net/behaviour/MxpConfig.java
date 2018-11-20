@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onosproject.drivers.fujitsu.behaviour;
+package org.onosproject.net.behaviour;
 
 import com.google.common.annotations.Beta;
 import org.onosproject.net.driver.HandlerBehaviour;
@@ -37,75 +37,75 @@ public interface MxpConfig extends HandlerBehaviour {
     /**
      * Setea un tipo de trafico en el dispositivo.
      *
-     * @param tipo_trafico input data in string
+     * @param tipotrafico input data in string
      * @return response string
      */
-    String setTipoTrafico(String tipo_trafico);
+    String setTipoTrafico(String tipotrafico);
 
 
     /**
      * Setea el uso de fec linea.
      *
-     * @param tipo_fec_linea input data in string
+     * @param tipofeclinea input data in string
      * @return response string
      */
-    String setTipoFecLinea(String tipo_fec_linea);
+    String setTipoFecLinea(String tipofeclinea);
 
 
     /**
      * Setea el uso de fec cliente.
      *
-     * @param tipo_fec_cliente input data in string
+     * @param tipofeccliente input data in string
      * @return response string
      */
-    String setTipoFecCliente(String tipo_fec_cliente);
+    String setTipoFecCliente(String tipofeccliente);
 
 
     /**
      * Setea el uso de fec cliente.
      *
-     * @param edfa_output_power input data in string
+     * @param edfaoutputpower input data in string
      * @return response string
      */
-    String setEdfaOutPower(String edfa_output_power);
+    String setEdfaOutPower(String edfaoutputpower);
 
 
     /**
      * Setea la frecuencia de las notificaciones del dispositivo.
      *
-     * @param time_notify_config time data in string
+     * @param timenotifyconfig time data in string
      * @return response string
      */
-    String setTimeToNotify(String time_notify_config);
+    String setTimeToNotify(String timenotifyconfig);
 
 
     /**
-     * Setea el valor del EDFA a notificar. (umbral)
+     * Setea el valor del EDFA a notificar.
      *
-     * @param value_notify_config time data in string
+     * @param valuenotifyconfig time data in string
      * @return response string
      */
-    String setValueEdfaNotify(String value_notify_config);
+    String setValueEdfaNotify(String valuenotifyconfig);
 
 
     /**
-     * Setea el valor del rx_power a notificar. (umbral)
+     * Setea el valor del rx_power a notificar.
      *
-     * @param value_rx_power_notify_config time data in string
+     * @param valuerxpowernotifyconfig time data in string
      * @return response string
      */
-    String setValueRxPowerNotify(String value_rx_power_notify_config);
+    String setValueRxPowerNotify(String valuerxpowernotifyconfig);
 
     /**
-     * Setea el valor del rx_power a notificar. (umbral)
+     * Setea el valor del rx_power a notificar.
      *
-     * @param value_rx_power_notify_config time data in string
+     * @param deviceneighbors time data in string
      * @return response string
      */
     String setDeviceNeighbors(String deviceneighbors);
 
     /**
-     * Rpc para aplicar configuracion en el MXP
+     * Rpc para aplicar configuracion en el MXP.
      *
      * @return response string
      */

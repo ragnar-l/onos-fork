@@ -69,7 +69,7 @@ public class NetconfSessionImplTest {
 
     private static final String TEST_USERNAME = "netconf";
     private static final String TEST_PASSWORD = "netconf123";
-    private static final String TEST_HOSTNAME = "127.0.0.1";
+    private static final String TEST_HOSTNAME = "127.0.0.2";
 
     private static final String TEST_SERFILE =
             System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "testkey.ser";

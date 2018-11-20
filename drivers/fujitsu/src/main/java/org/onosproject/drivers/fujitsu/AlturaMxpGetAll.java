@@ -16,7 +16,7 @@
 
 package org.onosproject.drivers.fujitsu;
 
-import org.onosproject.drivers.fujitsu.behaviour.MxpGetAll;
+import org.onosproject.net.behaviour.MxpGetAll;
 import org.onosproject.mastership.MastershipService;
 import org.onosproject.net.DeviceId;
 import org.onosproject.net.driver.AbstractHandlerBehaviour;
