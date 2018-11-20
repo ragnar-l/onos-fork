@@ -78,17 +78,13 @@ public class NetconfAlarmTranslator implements AlarmTranslator {
             while (descriptionNode != null) {
                 if (descriptionNode.getNodeType() == Node.ELEMENT_NODE) {
                     String description = nodeToString(descriptionNode);
-
-
-                    if(description.contains("mux-notify")){
+                    if (description.contains("mux-notify")) {
                         String identificador = getNotify(description);
                         alarms.add(new DefaultAlarm.Builder(AlarmId.alarmId(deviceId, identificador),
                                 deviceId, description,
                                 Alarm.SeverityLevel.WARNING,
                                 timeStamp).build());
-                    }
-
-                    else {
+                    } else {
                         alarms.add(new DefaultAlarm.Builder(AlarmId.alarmId(deviceId, Long.toString(timeStamp)),
                                 deviceId, description,
                                 Alarm.SeverityLevel.WARNING,
@@ -153,12 +149,11 @@ public class NetconfAlarmTranslator implements AlarmTranslator {
     private static String getNotify(String parseame) {
         String notify = StringUtils.substringBetween(parseame, "<INFO>", "</INFO>");
         String substring;
-        if (notify.contains("[ALARM] ")){
+        if (notify.contains("[ALARM] ")) {
             substring=notify.substring(8, notify.length());
         }
         else {
-            substring=notify.substring(5, notify.length());
-        }
-        return substring;
+            substring = notify.substring(5, notify.length());
+        } return substring;
     }
 }
