@@ -150,10 +150,10 @@ public class NetconfAlarmTranslator implements AlarmTranslator {
         String notify = StringUtils.substringBetween(parseame, "<INFO>", "</INFO>");
         String substring;
         if (notify.contains("[ALARM] ")) {
-            substring=notify.substring(8, notify.length());
-        }
-        else {
+            substring = notify.substring(8, notify.length());
+        } else {
             substring = notify.substring(5, notify.length());
-        } return substring;
+        }
+        return substring;
     }
 }
