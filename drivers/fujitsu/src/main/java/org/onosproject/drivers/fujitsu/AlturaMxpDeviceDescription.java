@@ -97,17 +97,16 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
          * El mismo, debe ser mayor a 30 segundos para dar tiempo al mxp a conectarse correctamente con onos.
          */
         String tiempo_conectado = devicecontroller.localStatus(deviceId); //obtengo tiempo transcurrido en string
-        tiempo_conectado = tiempo_conectado.replaceAll("\\D+",""); //obtengo solo la info en enteros del tiempo transcurrido
-        if(tiempo_conectado.equals("")){
-            tiempo_conectado="0"; //si no tiene info, es 0
+        tiempo_conectado = tiempo_conectado.replaceAll("\\D+",""); //obtengo solo la parte entera
+        if (tiempo_conectado.equals("")) {
+            tiempo_conectado = "0"; //si no tiene info, es 0
         }
         int tiempo_conectado_int = Integer.parseInt(tiempo_conectado); // casteo de String a int
-
-        while (tiempo_conectado_int<30) { //mientras que es menor a 30 segundos, repetir
+        while (tiempo_conectado_int < 30) { //mientras que es menor a 30 segundos, repetir
             tiempo_conectado = devicecontroller.localStatus(deviceId);
             tiempo_conectado = tiempo_conectado.replaceAll("\\D+","");
             if(tiempo_conectado.equals("")){
-                tiempo_conectado="0";
+                tiempo_conectado = "0";
             }
             tiempo_conectado_int = Integer.parseInt(tiempo_conectado);
         }
@@ -175,6 +174,42 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         DefaultAnnotations annotationHost = DefaultAnnotations.builder().set(AnnotationKeys.PORT_NAME, "Host").build();
         PortDescription host = DefaultPortDescription.builder()
                 .withPortNumber(PortNumber.portNumber(1))
+                .isEnabled(true)
+                .type(Port.Type.COPPER)
+                .portSpeed(1000)
+                .annotations(annotationHost)
+                .build();
+        ports.add(host);
+
+        host = DefaultPortDescription.builder()
+                .withPortNumber(PortNumber.portNumber(2))
+                .isEnabled(true)
+                .type(Port.Type.COPPER)
+                .portSpeed(1000)
+                .annotations(annotationHost)
+                .build();
+        ports.add(host);
+
+        host = DefaultPortDescription.builder()
+                .withPortNumber(PortNumber.portNumber(3))
+                .isEnabled(true)
+                .type(Port.Type.COPPER)
+                .portSpeed(1000)
+                .annotations(annotationHost)
+                .build();
+        ports.add(host);
+
+        host = DefaultPortDescription.builder()
+                .withPortNumber(PortNumber.portNumber(4))
+                .isEnabled(true)
+                .type(Port.Type.COPPER)
+                .portSpeed(1000)
+                .annotations(annotationHost)
+                .build();
+        ports.add(host);
+
+        host = DefaultPortDescription.builder()
+                .withPortNumber(PortNumber.portNumber(5))
                 .isEnabled(true)
                 .type(Port.Type.COPPER)
                 .portSpeed(1000)

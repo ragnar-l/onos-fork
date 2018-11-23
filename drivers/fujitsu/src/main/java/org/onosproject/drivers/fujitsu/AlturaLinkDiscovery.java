@@ -73,10 +73,94 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         }
 
 
+        Set<LinkDescription> descs = new HashSet<>();
+
+        /**
+         * Se busca el of:1
+         */
+        com.google.common.base.Optional<Device> dev = Iterables.tryFind(
+                deviceService.getAvailableDevices(),
+                input -> input.id().toString().equals("of:0000000000000001"));
+        if (!dev.isPresent()) {
+            log.info("no esta el of:1");
+        } else {
+            if (this.handler().data().deviceId().toString().equals("netconf:172.16.0.141:830")) {
+                try {
+                    StringBuilder request = new StringBuilder("<mux-state-XFP1 xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+                    request.append("<Presence/>");
+                    request.append("</mux-state-XFP1>");
+
+                    reply = controller
+                            .getDevicesMap()
+                            .get(ncDeviceId)
+                            .getSession()
+                            .get(request.toString(), REPORT_ALL);
+                } catch (NetconfException e) {
+                    log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+                }
+                if (presenceOfModule(reply).equals("Yes")) {
+                    DeviceId localDeviceId = this.handler().data().deviceId();
+                    Port localPort = deviceService.getPorts(localDeviceId).get(1);
+                    ConnectPoint local = new ConnectPoint(localDeviceId, localPort.number());
+
+                    Device remoteDevice = dev.get();
+                    Port remotePort = deviceService.getPorts(remoteDevice.id()).get(1); // el puerto con el que formo el enlace vecino.
+                    ConnectPoint remote = new ConnectPoint(remoteDevice.id(), remotePort.number());
+                    DefaultAnnotations annotations = DefaultAnnotations.builder().set("layer", "IP").build();
+                    descs.add(new DefaultLinkDescription(
+                            local, remote, Link.Type.OPTICAL, false, annotations));
+                    descs.add(new DefaultLinkDescription(
+                            remote, local, Link.Type.OPTICAL, false, annotations));
+                }
+            }
+        }
+
+        /**
+         * Se busca el of:2
+         */
+        dev = Iterables.tryFind(
+                deviceService.getAvailableDevices(),
+                input -> input.id().toString().equals("of:0000000000000002"));
+        if (!dev.isPresent()) {
+            log.info("no esta el of:2");
+        } else {
+            if (this.handler().data().deviceId().toString().equals("netconf:172.16.0.142:830")) {
+                try {
+                    StringBuilder request = new StringBuilder("<mux-state-XFP1 xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+                    request.append("<Presence/>");
+                    request.append("</mux-state-XFP1>");
+
+                    reply = controller
+                            .getDevicesMap()
+                            .get(ncDeviceId)
+                            .getSession()
+                            .get(request.toString(), REPORT_ALL);
+                } catch (NetconfException e) {
+                    log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+                }
+                if (presenceOfModule(reply).equals("Yes")) {
+                    DeviceId localDeviceId = this.handler().data().deviceId();
+                    Port localPort = deviceService.getPorts(localDeviceId).get(1);
+                    ConnectPoint local = new ConnectPoint(localDeviceId, localPort.number());
+
+                    Device remoteDevice = dev.get();
+                    Port remotePort = deviceService.getPorts(remoteDevice.id()).get(1); // el puerto con el que formo el enlace vecino.
+                    ConnectPoint remote = new ConnectPoint(remoteDevice.id(), remotePort.number());
+                    DefaultAnnotations annotations = DefaultAnnotations.builder().set("layer", "IP").build();
+                    descs.add(new DefaultLinkDescription(
+                            local, remote, Link.Type.OPTICAL, false, annotations));
+                    descs.add(new DefaultLinkDescription(
+                            remote, local, Link.Type.OPTICAL, false, annotations));
+                }
+            }
+        }
+
+
+
         /**
          * Pregunto al dispositivo local quien es su vecino.
          */
-        Set<LinkDescription> descs = new HashSet<>();
+
 
         try {
             StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
@@ -102,7 +186,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         /**
          * Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
          */
-        com.google.common.base.Optional<Device> dev = Iterables.tryFind(
+        dev = Iterables.tryFind(
                 deviceService.getAvailableDevices(),
                 input -> input.serialNumber().equals(vecino));
         if (!dev.isPresent()) {
@@ -152,5 +236,15 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         log.info(version);
         String serialNumber = StringUtils.substringBetween(version, "<deviceneighbors>", "</deviceneighbors>");
         return serialNumber;
+    }
+
+    /**
+     * Retrieving serial number version of device.
+     * @param version the return of show version command
+     * @return the serial number of the device
+     */
+    private String presenceOfModule(String version) {
+        String presence = StringUtils.substringBetween(version, "<Presence>", "</Presence>");
+        return presence;
     }
 }
