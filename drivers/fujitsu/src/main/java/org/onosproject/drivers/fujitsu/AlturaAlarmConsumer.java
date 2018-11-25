@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.onosproject.drivers.utilities.XmlConfigParser;
 import org.onosproject.incubator.net.faultmanagement.alarm.*;
+import org.onosproject.net.Device;
 import org.onosproject.net.DeviceId;
 import org.onosproject.net.device.DeviceService;
 import org.onosproject.net.driver.AbstractHandlerBehaviour;
@@ -76,13 +77,16 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
         AlarmService alarmService = this.handler().get(AlarmService.class);
         Iterator it = alarmService.getActiveAlarms().iterator();
 
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+
 
         while (it.hasNext()) {
             Alarm b = (Alarm) it.next();
-            if (b.deviceId().toString().contains("netconf:172.16.0.") || b.description().contains("netconf-session-start") || b.description().contains("netconf-session-end") || b.description().contains("netconf-config-change") ) {
+            Device localdevice = deviceService.getDevice(b.deviceId());
+            if ((localdevice.manufacturer().equals("ALTURA")) && (b.description().contains("netconf-session-start") || b.description().contains("netconf-session-end") || b.description().contains("netconf-config-change") ) ) {
                 alarmService.remove(b.id());
+                log.info("ELIMINO");
             }
-            log.info("ELIMINO");
         }
 
 
