@@ -77,20 +77,8 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
     @Override
     public DeviceDescription discoverDeviceDetails() {
 
-        NetconfController controller = checkNotNull(handler().get(NetconfController.class));
-        NetconfSession session = controller.getDevicesMap().get(handler().data().deviceId()).getSession();
-
         DeviceService devicecontroller = checkNotNull(handler().get(DeviceService.class));
         DeviceId deviceId = handler().data().deviceId();
-
-        NetconfDevice ncDevice = controller.getDevicesMap().get(handler().data().deviceId());
-        if (ncDevice == null) {
-            log.error("Internal ONOS Error. Device has been marked as reachable, " +
-                            "but deviceID {} is not in Devices Map. Continuing with empty description",
-                    handler().data().deviceId());
-            return null;
-        }
-
 
         /**
          * Lo primero que hago es ver el tiempo que paso desde que se conecto el dispositivo.
@@ -103,6 +91,8 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         }
         int tiempo_conectado_int = Integer.parseInt(tiempo_conectado); // casteo de String a int
         while (tiempo_conectado_int < 30) { //mientras que es menor a 30 segundos, repetir
+            devicecontroller = checkNotNull(handler().get(DeviceService.class));
+            deviceId = handler().data().deviceId();
             tiempo_conectado = devicecontroller.localStatus(deviceId);
             tiempo_conectado = tiempo_conectado.replaceAll("\\D+","");
             if(tiempo_conectado.equals("")){
@@ -111,6 +101,19 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
             tiempo_conectado_int = Integer.parseInt(tiempo_conectado);
         }
 
+
+        log.info("Descubriendo dispositivo...");
+        NetconfController controller = checkNotNull(handler().get(NetconfController.class));
+        NetconfSession session = controller.getDevicesMap().get(handler().data().deviceId()).getSession();
+
+
+        NetconfDevice ncDevice = controller.getDevicesMap().get(handler().data().deviceId());
+        if (ncDevice == null) {
+            log.error("Internal ONOS Error. Device has been marked as reachable, " +
+                            "but deviceID {} is not in Devices Map. Continuing with empty description",
+                    handler().data().deviceId());
+            return null;
+        }
 
 
         StringBuilder request = new StringBuilder("<get>");
@@ -138,9 +141,12 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         details[2] = getSwVersion(info_device);
         details[3] = serialNumber(info_device);
 
-        StringBuilder suscribe = new StringBuilder("<create-subscription xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\"/>");
+        StringBuilder suscribe = new StringBuilder("<create-subscription xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">");
+        //suscribe.append("</filter>");
+        suscribe.append("</create-subscription>");
         try {
             info_device = session.doWrappedRpc(suscribe.toString());
+            //session.startSubscription("mux-notify");
         } catch (NetconfException e) {
             log.info("NetconfException en AlturaMxpDeviceDescription - Subscribe");
             throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
