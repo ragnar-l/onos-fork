@@ -102,6 +102,97 @@
             </completers>
         </command>
 
+        <command>
+            <action class="org.onosproject.drivers.fujitsu.cli.MxpGetConfigContainerCommand"/>
+            <completers>
+                <ref component-id="deviceIdCompleter"/>
+            </completers>
+        </command>
+
+        <command>
+            <action class="org.onosproject.drivers.fujitsu.cli.MxpGetStateContainerCommand"/>
+            <completers>
+                <ref component-id="deviceIdCompleter"/>
+            </completers>
+        </command>
+
+        <command>
+            <action class="org.onosproject.drivers.fujitsu.cli.MxpGetStateDspContainerCommand"/>
+            <completers>
+                <ref component-id="deviceIdCompleter"/>
+            </completers>
+        </command>
+
+        <command>
+            <action class="org.onosproject.drivers.fujitsu.cli.MxpGetStateEdfaContainerCommand"/>
+            <completers>
+                <ref component-id="deviceIdCompleter"/>
+            </completers>
+        </command>
+
+        <command>
+            <action class="org.onosproject.drivers.fujitsu.cli.MxpGetStateMiscContainerCommand"/>
+            <completers>
+                <ref component-id="deviceIdCompleter"/>
+            </completers>
+        </command>
+
+        <command>
+            <action class="org.onosproject.drivers.fujitsu.cli.MxpGetStatePowerContainerCommand"/>
+            <completers>
+                <ref component-id="deviceIdCompleter"/>
+            </completers>
+        </command>
+
+        <command>
+            <action class="org.onosproject.drivers.fujitsu.cli.MxpGetStateTempHumContainerCommand"/>
+            <completers>
+                <ref component-id="deviceIdCompleter"/>
+            </completers>
+        </command>
+
+        <command>
+            <action class="org.onosproject.drivers.fujitsu.cli.MxpGetStateTxRxAlarmContainerCommand"/>
+            <completers>
+                <ref component-id="deviceIdCompleter"/>
+            </completers>
+        </command>
+
+        <command>
+            <action class="org.onosproject.drivers.fujitsu.cli.MxpGetStateXfpOneContainerCommand"/>
+            <completers>
+                <ref component-id="deviceIdCompleter"/>
+            </completers>
+        </command>
+
+        <command>
+            <action class="org.onosproject.drivers.fujitsu.cli.MxpGetStateXfpTwoContainerCommand"/>
+            <completers>
+                <ref component-id="deviceIdCompleter"/>
+            </completers>
+        </command>
+
+        <command>
+            <action class="org.onosproject.drivers.fujitsu.cli.MxpGetStateXfpThreeContainerCommand"/>
+            <completers>
+                <ref component-id="deviceIdCompleter"/>
+            </completers>
+        </command>
+
+        <command>
+            <action class="org.onosproject.drivers.fujitsu.cli.MxpGetStateXfpFourContainerCommand"/>
+            <completers>
+                <ref component-id="deviceIdCompleter"/>
+            </completers>
+        </command>
+
+        <command>
+            <action class="org.onosproject.drivers.fujitsu.cli.MxpSettingsConfigCommand"/>
+            <completers>
+                <ref component-id="deviceIdCompleter"/>
+            </completers>
+        </command>
+
     </command-bundle>
 
     <bean id="deviceIdCompleter" class="org.onosproject.cli.net.DeviceIdCompleter"/>

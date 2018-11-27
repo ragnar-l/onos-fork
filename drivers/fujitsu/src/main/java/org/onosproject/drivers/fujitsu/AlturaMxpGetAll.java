@@ -50,8 +50,8 @@ public class AlturaMxpGetAll extends AbstractHandlerBehaviour
 
         if (!mastershipService.isLocalMaster(ncDeviceId)) {
             log.warn("Not master for {} Use {} to execute command",
-                     ncDeviceId,
-                     mastershipService.getMasterFor(ncDeviceId));
+                    ncDeviceId,
+                    mastershipService.getMasterFor(ncDeviceId));
             return null;
         }
 
@@ -70,6 +70,354 @@ public class AlturaMxpGetAll extends AbstractHandlerBehaviour
             request.append("<mux-state-XFP4 xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
 
 
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+        return reply;
+    }
+
+    @Override
+    public String getConfigContainer() {
+        DriverHandler handler = handler();
+        NetconfController controller = handler.get(NetconfController.class);
+        MastershipService mastershipService = handler.get(MastershipService.class);
+        DeviceId ncDeviceId = handler.data().deviceId();
+        checkNotNull(controller, "Netconf controller is null");
+        String reply = null;
+
+        if (!mastershipService.isLocalMaster(ncDeviceId)) {
+            log.warn("Not master for {} Use {} to execute command",
+                    ncDeviceId,
+                    mastershipService.getMasterFor(ncDeviceId));
+            return null;
+        }
+
+        try {
+            StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+        return reply;
+    }
+
+    @Override
+    public String getStateContainer() {
+        DriverHandler handler = handler();
+        NetconfController controller = handler.get(NetconfController.class);
+        MastershipService mastershipService = handler.get(MastershipService.class);
+        DeviceId ncDeviceId = handler.data().deviceId();
+        checkNotNull(controller, "Netconf controller is null");
+        String reply = null;
+
+        if (!mastershipService.isLocalMaster(ncDeviceId)) {
+            log.warn("Not master for {} Use {} to execute command",
+                    ncDeviceId,
+                    mastershipService.getMasterFor(ncDeviceId));
+            return null;
+        }
+
+        try {
+            StringBuilder request = new StringBuilder("<mux-state xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+        return reply;
+    }
+
+    @Override
+    public String getStateMiscContainer() {
+        DriverHandler handler = handler();
+        NetconfController controller = handler.get(NetconfController.class);
+        MastershipService mastershipService = handler.get(MastershipService.class);
+        DeviceId ncDeviceId = handler.data().deviceId();
+        checkNotNull(controller, "Netconf controller is null");
+        String reply = null;
+
+        if (!mastershipService.isLocalMaster(ncDeviceId)) {
+            log.warn("Not master for {} Use {} to execute command",
+                    ncDeviceId,
+                    mastershipService.getMasterFor(ncDeviceId));
+            return null;
+        }
+
+        try {
+            StringBuilder request = new StringBuilder("<mux-state-misc xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+        return reply;
+    }
+
+    @Override
+    public String getStateTxRxAlarmContainer() {
+        DriverHandler handler = handler();
+        NetconfController controller = handler.get(NetconfController.class);
+        MastershipService mastershipService = handler.get(MastershipService.class);
+        DeviceId ncDeviceId = handler.data().deviceId();
+        checkNotNull(controller, "Netconf controller is null");
+        String reply = null;
+
+        if (!mastershipService.isLocalMaster(ncDeviceId)) {
+            log.warn("Not master for {} Use {} to execute command",
+                    ncDeviceId,
+                    mastershipService.getMasterFor(ncDeviceId));
+            return null;
+        }
+
+        try {
+            StringBuilder request = new StringBuilder("<mux-state-TX-RX-alarms xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+        return reply;
+    }
+
+    @Override
+    public String getStatePowerContainer() {
+        DriverHandler handler = handler();
+        NetconfController controller = handler.get(NetconfController.class);
+        MastershipService mastershipService = handler.get(MastershipService.class);
+        DeviceId ncDeviceId = handler.data().deviceId();
+        checkNotNull(controller, "Netconf controller is null");
+        String reply = null;
+
+        if (!mastershipService.isLocalMaster(ncDeviceId)) {
+            log.warn("Not master for {} Use {} to execute command",
+                    ncDeviceId,
+                    mastershipService.getMasterFor(ncDeviceId));
+            return null;
+        }
+
+        try {
+            StringBuilder request = new StringBuilder("<mux-state-power xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+        return reply;
+    }
+
+    @Override
+    public String getDspContainer() {
+        DriverHandler handler = handler();
+        NetconfController controller = handler.get(NetconfController.class);
+        MastershipService mastershipService = handler.get(MastershipService.class);
+        DeviceId ncDeviceId = handler.data().deviceId();
+        checkNotNull(controller, "Netconf controller is null");
+        String reply = null;
+
+        if (!mastershipService.isLocalMaster(ncDeviceId)) {
+            log.warn("Not master for {} Use {} to execute command",
+                    ncDeviceId,
+                    mastershipService.getMasterFor(ncDeviceId));
+            return null;
+        }
+
+        try {
+            StringBuilder request = new StringBuilder("<mux-state-dsp xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+        return reply;
+    }
+
+    @Override
+    public String getEdfaContainer() {
+        DriverHandler handler = handler();
+        NetconfController controller = handler.get(NetconfController.class);
+        MastershipService mastershipService = handler.get(MastershipService.class);
+        DeviceId ncDeviceId = handler.data().deviceId();
+        checkNotNull(controller, "Netconf controller is null");
+        String reply = null;
+
+        if (!mastershipService.isLocalMaster(ncDeviceId)) {
+            log.warn("Not master for {} Use {} to execute command",
+                    ncDeviceId,
+                    mastershipService.getMasterFor(ncDeviceId));
+            return null;
+        }
+
+        try {
+            StringBuilder request = new StringBuilder("<mux-state-edfa xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+        return reply;
+    }
+
+    @Override
+    public String getTempHumContainer() {
+        DriverHandler handler = handler();
+        NetconfController controller = handler.get(NetconfController.class);
+        MastershipService mastershipService = handler.get(MastershipService.class);
+        DeviceId ncDeviceId = handler.data().deviceId();
+        checkNotNull(controller, "Netconf controller is null");
+        String reply = null;
+
+        if (!mastershipService.isLocalMaster(ncDeviceId)) {
+            log.warn("Not master for {} Use {} to execute command",
+                    ncDeviceId,
+                    mastershipService.getMasterFor(ncDeviceId));
+            return null;
+        }
+
+        try {
+            StringBuilder request = new StringBuilder("<mux-state-temp-hum xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+        return reply;
+    }
+
+    @Override
+    public String getXFPOneContainer() {
+        DriverHandler handler = handler();
+        NetconfController controller = handler.get(NetconfController.class);
+        MastershipService mastershipService = handler.get(MastershipService.class);
+        DeviceId ncDeviceId = handler.data().deviceId();
+        checkNotNull(controller, "Netconf controller is null");
+        String reply = null;
+
+        if (!mastershipService.isLocalMaster(ncDeviceId)) {
+            log.warn("Not master for {} Use {} to execute command",
+                    ncDeviceId,
+                    mastershipService.getMasterFor(ncDeviceId));
+            return null;
+        }
+
+        try {
+            StringBuilder request = new StringBuilder("<mux-state-XFP1 xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+        return reply;
+    }
+
+    @Override
+    public String getXFPTwoContainer() {
+        DriverHandler handler = handler();
+        NetconfController controller = handler.get(NetconfController.class);
+        MastershipService mastershipService = handler.get(MastershipService.class);
+        DeviceId ncDeviceId = handler.data().deviceId();
+        checkNotNull(controller, "Netconf controller is null");
+        String reply = null;
+
+        if (!mastershipService.isLocalMaster(ncDeviceId)) {
+            log.warn("Not master for {} Use {} to execute command",
+                    ncDeviceId,
+                    mastershipService.getMasterFor(ncDeviceId));
+            return null;
+        }
+
+        try {
+            StringBuilder request = new StringBuilder("<mux-state-XFP2 xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+        return reply;
+    }
+
+    @Override
+    public String getXFPThreeContainer() {
+        DriverHandler handler = handler();
+        NetconfController controller = handler.get(NetconfController.class);
+        MastershipService mastershipService = handler.get(MastershipService.class);
+        DeviceId ncDeviceId = handler.data().deviceId();
+        checkNotNull(controller, "Netconf controller is null");
+        String reply = null;
+
+        if (!mastershipService.isLocalMaster(ncDeviceId)) {
+            log.warn("Not master for {} Use {} to execute command",
+                    ncDeviceId,
+                    mastershipService.getMasterFor(ncDeviceId));
+            return null;
+        }
+
+        try {
+            StringBuilder request = new StringBuilder("<mux-state-XFP3 xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+        return reply;
+    }
+
+    @Override
+    public String getXFPFourContainer() {
+        DriverHandler handler = handler();
+        NetconfController controller = handler.get(NetconfController.class);
+        MastershipService mastershipService = handler.get(MastershipService.class);
+        DeviceId ncDeviceId = handler.data().deviceId();
+        checkNotNull(controller, "Netconf controller is null");
+        String reply = null;
+
+        if (!mastershipService.isLocalMaster(ncDeviceId)) {
+            log.warn("Not master for {} Use {} to execute command",
+                    ncDeviceId,
+                    mastershipService.getMasterFor(ncDeviceId));
+            return null;
+        }
+
+        try {
+            StringBuilder request = new StringBuilder("<mux-state-XFP4 xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
             reply = controller
                     .getDevicesMap()
                     .get(ncDeviceId)

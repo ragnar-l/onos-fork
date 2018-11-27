@@ -111,4 +111,11 @@ public interface MxpConfig extends HandlerBehaviour {
      */
     String rpcApplyConfig();
 
+    /**
+     * Rpc settings MXP.
+     *
+     * @return response string
+     */
+    String rpcSettingsConfig();
+
 }

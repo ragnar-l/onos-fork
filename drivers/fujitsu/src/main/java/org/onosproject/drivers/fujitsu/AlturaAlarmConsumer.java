@@ -85,15 +85,10 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
             Device localdevice = deviceService.getDevice(b.deviceId());
             if ((localdevice.manufacturer().equals("ALTURA")) && (b.description().contains("netconf-session-start") || b.description().contains("netconf-session-end") || b.description().contains("netconf-config-change") ) ) {
                 alarmService.remove(b.id());
-                log.info("ELIMINO");
+                log.info("ELIMINO ALARMA {}", b.id());
             }
         }
-
-
-
-        log.info("SALGO");
-
-
+        
         return alarms;
     }
 

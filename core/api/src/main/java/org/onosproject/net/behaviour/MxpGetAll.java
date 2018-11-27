@@ -31,4 +31,88 @@ public interface MxpGetAll extends HandlerBehaviour {
      */
     String getAll();
 
+    /**
+     * Obtain config container available in mxp device.
+     *
+     * @return response string
+     */
+    String getConfigContainer();
+
+    /**
+     * Obtain state container available in mxp device.
+     *
+     * @return response string
+     */
+    String getStateContainer();
+
+    /**
+     * Obtain state misc container available in mxp device.
+     *
+     * @return response string
+     */
+    String getStateMiscContainer();
+
+    /**
+     * Obtain state tx/rx alarm container available in mxp device.
+     *
+     * @return response string
+     */
+    String getStateTxRxAlarmContainer();
+
+    /**
+     * Obtain state power container available in mxp device.
+     *
+     * @return response string
+     */
+    String getStatePowerContainer();
+
+    /**
+     * Obtain state dsp container available in mxp device.
+     *
+     * @return response string
+     */
+    String getDspContainer();
+
+    /**
+     * Obtain state edfa container available in mxp device.
+     *
+     * @return response string
+     */
+    String getEdfaContainer();
+
+    /**
+     * Obtain state temp/hum container available in mxp device.
+     *
+     * @return response string
+     */
+    String getTempHumContainer();
+
+    /**
+     * Obtain state XFP1 container available in mxp device.
+     *
+     * @return response string
+     */
+    String getXFPOneContainer();
+
+    /**
+     * Obtain state XFP2 container available in mxp device.
+     *
+     * @return response string
+     */
+    String getXFPTwoContainer();
+
+    /**
+     * Obtain state XFP3 container available in mxp device.
+     *
+     * @return response string
+     */
+    String getXFPThreeContainer();
+
+    /**
+     * Obtain state XFP4 container available in mxp device.
+     *
+     * @return response string
+     */
+    String getXFPFourContainer();
+
 }
