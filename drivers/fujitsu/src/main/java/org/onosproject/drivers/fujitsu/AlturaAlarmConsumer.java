@@ -141,7 +141,7 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
             log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
         }
 
-        local = serialNumber(local);
+        local = serialNumberr(local);
 
         /**
          * Pregunto al dispositivo vecino que configuracion tiene.
@@ -161,7 +161,7 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
             log.error("Cannot communicate to device {} exception {}", dev, e);
         }
 
-        vecin = serialNumber(vecin);
+        vecin = serialNumberr(vecin);
 
         if(local.toString().equals(vecin.toString())){
             log.info("SON IGUALES");
@@ -179,6 +179,17 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
      * @return the serial number of the device
      */
     private String serialNumber(String version) {
+        log.info(version);
+        String serialNumber = StringUtils.substringBetween(version, "<deviceneighbors>", "</deviceneighbors>");
+        return serialNumber;
+    }
+
+    /**
+     * Retrieving serial number version of device.
+     * @param version the return of show version command
+     * @return the serial number of the device
+     */
+    private String serialNumberr(String version) {
         log.info(version);
         String serialNumber = StringUtils.substringBetween(version, "<tipo_trafico>", "</tipo_trafico>");
         return serialNumber;
