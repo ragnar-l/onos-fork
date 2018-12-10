@@ -17,7 +17,9 @@
 package org.onosproject.drivers.fujitsu;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.lang.StringUtils;
 import org.onosproject.drivers.utilities.XmlConfigParser;
 import org.onosproject.incubator.net.faultmanagement.alarm.*;
 import org.onosproject.net.Device;
@@ -85,11 +87,101 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
             Device localdevice = deviceService.getDevice(b.deviceId());
             if ((localdevice.manufacturer().equals("ALTURA")) && (b.description().contains("netconf-session-start") || b.description().contains("netconf-session-end") || b.description().contains("netconf-config-change") ) ) {
                 alarmService.remove(b.id());
-                log.info("ELIMINO ALARMA {}", b.id());
+                log.info("ELIMINO");
             }
         }
-        
+
+        /**
+         * Pregunto al dispositivo local quien es su vecino.
+         */
+        String reply = null;
+        try {
+            StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+            request.append("<deviceneighbors/>");
+            request.append("</mux-config>");
+
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+
+        String vecino = serialNumber(reply);
+
+        /**
+         * Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
+         */
+        com.google.common.base.Optional<Device> dev = Iterables.tryFind(
+                deviceService.getAvailableDevices(),
+                input -> input.serialNumber().equals(vecino));
+        if (!dev.isPresent()) {
+            log.info("Device with chassis ID {} does not exist");
+            return alarms;
+        }
+
+
+        /**
+         * Pregunto al dispositivo local que configuracion tiene.
+         */
+        String local = null;
+        try {
+            StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+            request.append("<tipo_trafico/>");
+            request.append("</mux-config>");
+
+            local = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+
+        local = serialNumber(local);
+
+        /**
+         * Pregunto al dispositivo vecino que configuracion tiene.
+         */
+        String vecin = null;
+        try {
+            StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+            request.append("<tipo_trafico/>");
+            request.append("</mux-config>");
+
+            vecin = controller
+                    .getDevicesMap()
+                    .get(dev)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", dev, e);
+        }
+
+        vecin = serialNumber(vecin);
+
+        if(local.toString().equals(vecin.toString())){
+            log.info("SON IGUALES");
+        }
+
+        log.info("SALGO");
+
+
         return alarms;
+    }
+
+    /**
+     * Retrieving serial number version of device.
+     * @param version the return of show version command
+     * @return the serial number of the device
+     */
+    private String serialNumber(String version) {
+        log.info(version);
+        String serialNumber = StringUtils.substringBetween(version, "<tipo_trafico>", "</tipo_trafico>");
+        return serialNumber;
     }
 
 
