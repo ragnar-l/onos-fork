@@ -163,8 +163,11 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
 
         vecin = serialNumberr(vecin);
 
-        if(local.toString().equals(vecin.toString())){
-            log.info("SON IGUALES");
+        if (local.toString().equals(vecin.toString())) {
+            log.info("SON IGUALESsssssssSSsS");
+        }
+        else {
+            log.info("SON Distintosssssssssss");
         }
 
         log.info("SALGO");
