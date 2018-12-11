@@ -92,6 +92,22 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
         }
 
         /**
+         * Tengo que esperar hasta que el dispositivo se conecte con ONOS.
+         * Una vez se conecte, ONOS consulta por la descripcion del dispositivo. Si el mismo es OTN, puedo seguir en getLinks.
+         * De lo contrario, retorno null.
+         */
+        Device localdevice = deviceService.getDevice(ncDeviceId);
+
+        if ( (localdevice.swVersion().equals("1.0")) && (localdevice.type().toString().equals("OTN")) ) {
+            log.debug("Dispositivo no listo");
+        }
+        else{
+            log.debug("Dispositivo listo");
+            return alarms;
+        }
+
+
+        /**
          * Pregunto al dispositivo local quien es su vecino.
          */
         String reply = null;
@@ -151,7 +167,7 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
             StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
             request.append("<tipo_trafico/>");
             request.append("</mux-config>");
-
+            log.info("ENTRO ACASAAA");
             vecin = controller
                     .getDevicesMap()
                     .get(dev)
