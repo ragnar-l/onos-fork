@@ -91,6 +91,8 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
             }
         }
 
+
+
         /**
          * Tengo que esperar hasta que el dispositivo se conecte con ONOS.
          * Una vez se conecte, ONOS consulta por la descripcion del dispositivo. Si el mismo es OTN, puedo seguir en getLinks.
@@ -99,10 +101,10 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
         Device localdevice = deviceService.getDevice(ncDeviceId);
 
         if ( (localdevice.swVersion().equals("1.0")) && (localdevice.type().toString().equals("OTN")) ) {
-            log.debug("Dispositivo no listo");
+            log.debug("Dispositivo listo");
         }
         else{
-            log.debug("Dispositivo listo");
+            log.debug("Dispositivo no listo");
             return alarms;
         }
 
@@ -125,7 +127,10 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
             log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
         }
 
-        String vecino = serialNumber(reply);
+        //obtengo la info del vecino en limpio, sin el resto del xml
+        String vecino = getVecino(reply);
+
+
 
         /**
          * Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
@@ -157,7 +162,9 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
             log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
         }
 
-        local = serialNumberr(local);
+        //obtengo la info de tipo de trafico en limpio, sin el resto del xml
+        local = getTipoTrafico(local);
+
 
         /**
          * Pregunto al dispositivo vecino que configuracion tiene.
@@ -167,29 +174,36 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
             StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
             request.append("<tipo_trafico/>");
             request.append("</mux-config>");
-            log.info("ENTRO ACASAAA");
             vecin = controller
                     .getDevicesMap()
-                    .get(dev.get().id())
+                    .get(dev.get().id()) //FIX MEEEE, lo tengo que hacer para todos los dispositivos. Aca se hace solo para uno de los vecinos
                     .getSession()
                     .get(request.toString(), REPORT_ALL);
         } catch (NetconfException e) {
             log.error("Cannot communicate to device {} exception {}", dev, e);
         }
 
-        log.info("la respuesta esssss {}",vecin);
+        //obtengo la info de tipo de trafico en limpio, sin el resto del xml
+        vecin = getTipoTrafico(vecin);
 
-        vecin = serialNumberr(vecin);
 
 
-        log.info(local);
-        log.info(vecin);
 
         if (local.toString().equals(vecin.toString())) {
             log.info("SON IGUALESsssssssSSsS");
+            alarms.add(new DefaultAlarm.Builder(AlarmId.alarmId(ncDeviceId, "WARNING CONFIG"),
+                    ncDeviceId, "[--] mux-notify xmlns; Inconsistent config with neighbor "+vecino,
+                    SeverityLevel.MINOR,
+                    System.currentTimeMillis()).build());
         }
         else {
             log.info("SON Distintosssssssssss");
+
+            alarms.add(new DefaultAlarm.Builder(AlarmId.alarmId(ncDeviceId, "WARNING CONFIG"),
+                    ncDeviceId, "[ALARM] mux-notify xmlns; Inconsistent config with neighbor "+vecino,
+                    SeverityLevel.MINOR,
+                    System.currentTimeMillis()).build());
+
         }
 
         log.info("SALGO");
@@ -203,7 +217,7 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
      * @param version the return of show version command
      * @return the serial number of the device
      */
-    private String serialNumber(String version) {
+    private String getVecino(String version) {
         log.info(version);
         String serialNumber = StringUtils.substringBetween(version, "<deviceneighbors>", "</deviceneighbors>");
         return serialNumber;
@@ -214,7 +228,7 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
      * @param version the return of show version command
      * @return the serial number of the device
      */
-    private String serialNumberr(String version) {
+    private String getTipoTrafico(String version) {
         log.info(version);
         String serialNumber = StringUtils.substringBetween(version, "<tipo_trafico>", "</tipo_trafico>");
         return serialNumber;
