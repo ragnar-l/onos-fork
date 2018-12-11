@@ -170,7 +170,7 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
             log.info("ENTRO ACASAAA");
             vecin = controller
                     .getDevicesMap()
-                    .get(dev)
+                    .get(dev.get().id())
                     .getSession()
                     .get(request.toString(), REPORT_ALL);
         } catch (NetconfException e) {
