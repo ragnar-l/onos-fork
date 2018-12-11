@@ -177,6 +177,8 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
             log.error("Cannot communicate to device {} exception {}", dev, e);
         }
 
+        log.info("la respuesta esssss {}",vecin);
+
         vecin = serialNumberr(vecin);
 
 
