@@ -49,6 +49,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.onlab.osgi.ServiceDirectory;
 
 import org.onosproject.incubator.net.faultmanagement.alarm.AlarmService;
+import com.google.common.collect.Lists;
+
+
+import org.onosproject.netconf.NetconfDeviceOutputEvent;
+import org.onosproject.netconf.NetconfDeviceOutputEventListener;
 
 
 public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements AlarmConsumer {
@@ -56,7 +61,8 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
     private DeviceId ncDeviceId;
 
 
-
+    private InternalTopologyListener topologyListener;
+    private static List<NetconfDeviceOutputEventListener> netconfDeviceEventListeners             = Lists.newArrayList();
 
     @Override
     public List<Alarm> consumeAlarms() {
@@ -92,6 +98,7 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
         }
 
 
+        topologyListener = new InternalTopologyListener();
 
         /**
          * Tengo que esperar hasta que el dispositivo se conecte con ONOS.
@@ -232,6 +239,15 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
         log.info(version);
         String serialNumber = StringUtils.substringBetween(version, "<tipo_trafico>", "</tipo_trafico>");
         return serialNumber;
+    }
+
+    private class InternalTopologyListener implements NetconfDeviceOutputEventListener {
+
+        public void event(NetconfDeviceOutputEvent event) {
+            log.info("ENTREEEE");
+            log.info("############# Topology event type ------> {}", event.type());
+
+        }
     }
 
 
