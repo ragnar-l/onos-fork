@@ -32,12 +32,12 @@ import org.onosproject.net.device.DeviceDescription;
 import org.onosproject.net.device.DeviceDescriptionDiscovery;
 import org.onosproject.net.device.PortDescription;
 import org.onosproject.net.driver.AbstractHandlerBehaviour;
-import org.onosproject.netconf.NetconfController;
-import org.onosproject.netconf.NetconfException;
-import org.onosproject.netconf.NetconfSession;
+import org.onosproject.netconf.*;
 import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -61,7 +61,6 @@ import org.onosproject.net.device.DefaultDeviceDescription;
 import org.onosproject.net.device.DeviceService;
 
 import org.apache.commons.lang.StringUtils;
-import org.onosproject.netconf.NetconfDevice;
 import org.onlab.packet.ChassisId;
 import org.onosproject.net.device.DeviceService;
 import org.onosproject.netconf.ctl.impl.NetconfSessionMinaImpl;
@@ -156,6 +155,10 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
                 details[0], details[1],
                 details[2], details[3],
                 new ChassisId(), false, DefaultAnnotations.EMPTY);
+
+        NetconfDevice device = controller.getNetconfDevice(deviceId);
+        InternalNotificationListener listener = new InternalNotificationListener(device.getDeviceInfo());
+        session.addDeviceOutputListener(listener);
 
         return defaultDescription;
     }
@@ -269,6 +272,26 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
     private static String serialNumber(String version) {
         String serialNumber = StringUtils.substringBetween(version, "<device_boardId>", "</device_boardId>");
         return serialNumber;
+    }
+
+
+    private class InternalNotificationListener
+            extends FilteringNetconfDeviceOutputEventListener
+            implements NetconfDeviceOutputEventListener {
+
+        InternalNotificationListener(NetconfDeviceInfo deviceInfo) {
+            super(deviceInfo);
+        }
+
+        @Override
+        public void event(NetconfDeviceOutputEvent event) {
+            if (event.type() == NetconfDeviceOutputEvent.Type.DEVICE_NOTIFICATION) {
+                DeviceId deviceId = event.getDeviceInfo().getDeviceId();
+                String message = event.getMessagePayload();
+                InputStream in = new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8));
+                log.info("ESAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            }
+        }
     }
 
 }
