@@ -228,6 +228,9 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
                 .build();
         ports.add(host);
 
+        TopoAlarmListener listener = new TopoAlarmListener();
+
+
         return ports;
     }
 
