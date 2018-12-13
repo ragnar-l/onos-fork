@@ -32,6 +32,7 @@ import org.onosproject.net.device.DeviceDescription;
 import org.onosproject.net.device.DeviceDescriptionDiscovery;
 import org.onosproject.net.device.PortDescription;
 import org.onosproject.net.driver.AbstractHandlerBehaviour;
+import org.onosproject.net.driver.DriverHandler;
 import org.onosproject.netconf.*;
 import org.slf4j.Logger;
 
@@ -287,9 +288,15 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         public void event(NetconfDeviceOutputEvent event) {
             if (event.type() == NetconfDeviceOutputEvent.Type.DEVICE_NOTIFICATION) {
                 DeviceId deviceId = event.getDeviceInfo().getDeviceId();
+                DriverHandler handler = handler();
+                DeviceService deviceService = handler().get(DeviceService.class);
+                Device localdevice = deviceService.getDevice(deviceId);
+                if ( (localdevice.swVersion().equals("1.0")) && (localdevice.type().toString().equals("OTN")) ) {
+                    log.info("ESAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                }
                 String message = event.getMessagePayload();
                 InputStream in = new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8));
-                log.info("ESAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+
             }
         }
     }
