@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.onosproject.drivers.utilities.XmlConfigParser;
+import org.onosproject.incubator.net.faultmanagement.alarm.AlarmEvent;
 import org.onosproject.net.AnnotationKeys;
 import org.onosproject.net.ChannelSpacing;
 import org.onosproject.net.CltSignalType;
@@ -65,6 +66,9 @@ import org.apache.commons.lang.StringUtils;
 import org.onlab.packet.ChassisId;
 import org.onosproject.net.device.DeviceService;
 import org.onosproject.netconf.ctl.impl.NetconfSessionMinaImpl;
+import org.onosproject.incubator.net.faultmanagement.alarm.AlarmListener;
+
+
 
 /**
  * Retrieves the ports (que puertos?) from a Altura MXP40gb device via netconf.
@@ -73,6 +77,8 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         implements DeviceDescriptionDiscovery {
 
     private final Logger log = getLogger(getClass());
+    private final AlarmListener alarmListener = new TopoAlarmListener();
+
 
     @Override
     public DeviceDescription discoverDeviceDetails() {
@@ -142,7 +148,6 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         details[3] = serialNumber(info_device);
 
         StringBuilder suscribe = new StringBuilder("<create-subscription xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">");
-        //suscribe.append("</filter>");
         suscribe.append("</create-subscription>");
         try {
             info_device = session.doWrappedRpc(suscribe.toString());
@@ -156,10 +161,6 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
                 details[0], details[1],
                 details[2], details[3],
                 new ChassisId(), false, DefaultAnnotations.EMPTY);
-
-        NetconfDevice device = controller.getNetconfDevice(deviceId);
-        InternalNotificationListener listener = new InternalNotificationListener(device.getDeviceInfo());
-        session.addDeviceOutputListener(listener);
 
         return defaultDescription;
     }
@@ -276,26 +277,13 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
     }
 
 
-    private class InternalNotificationListener
-            extends FilteringNetconfDeviceOutputEventListener
-            implements NetconfDeviceOutputEventListener {
-
-        InternalNotificationListener(NetconfDeviceInfo deviceInfo) {
-            super(deviceInfo);
-        }
-
+    //internal alarm listener
+    private class TopoAlarmListener implements AlarmListener {
         @Override
-        public void event(NetconfDeviceOutputEvent event) {
-            if (event.type() == NetconfDeviceOutputEvent.Type.DEVICE_NOTIFICATION) {
-                DeviceId deviceId = event.getDeviceInfo().getDeviceId();
-                DriverHandler handler = handler();
-                DeviceService deviceService = handler().get(DeviceService.class);
-                Device localdevice = deviceService.getDevice(deviceId);
-                if ( (localdevice.swVersion().equals("1.0")) && (localdevice.type().toString().equals("OTN")) ) {
-                    log.info("ESAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-                }
-                String message = event.getMessagePayload();
-                InputStream in = new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8));
+        public void event(AlarmEvent event) {
+            if (true) {
+                log.info("PEPEEEEEEEEEEEE");
+                log.info(event.subject().deviceId().toString());
 
             }
         }
