@@ -67,8 +67,7 @@ import org.onlab.packet.ChassisId;
 import org.onosproject.net.device.DeviceService;
 import org.onosproject.netconf.ctl.impl.NetconfSessionMinaImpl;
 import org.onosproject.incubator.net.faultmanagement.alarm.AlarmListener;
-
-
+import org.onosproject.incubator.net.faultmanagement.alarm.AlarmService;
 
 /**
  * Retrieves the ports (que puertos?) from a Altura MXP40gb device via netconf.
@@ -78,7 +77,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
 
     private final Logger log = getLogger(getClass());
     private final AlarmListener alarmListener = new TopoAlarmListener();
-
+    protected AlarmService alarmService;
 
     @Override
     public DeviceDescription discoverDeviceDetails() {
@@ -162,6 +161,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
                 details[2], details[3],
                 new ChassisId(), false, DefaultAnnotations.EMPTY);
 
+        alarmService.addListener(alarmListener);
         return defaultDescription;
     }
 
@@ -228,7 +228,6 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
                 .build();
         ports.add(host);
 
-        TopoAlarmListener listener = new TopoAlarmListener();
 
 
         return ports;
