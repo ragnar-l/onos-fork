@@ -16,46 +16,22 @@
 
 package org.onosproject.drivers.fujitsu;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.onosproject.drivers.utilities.XmlConfigParser;
-import org.onosproject.incubator.net.faultmanagement.alarm.AlarmEvent;
+
 import org.onosproject.net.AnnotationKeys;
-import org.onosproject.net.ChannelSpacing;
-import org.onosproject.net.CltSignalType;
 import org.onosproject.net.DefaultAnnotations;
-import org.onosproject.net.GridType;
-import org.onosproject.net.OchSignal;
-import org.onosproject.net.OduSignalType;
+
 import org.onosproject.net.PortNumber;
 import org.onosproject.net.device.DeviceDescription;
 import org.onosproject.net.device.DeviceDescriptionDiscovery;
 import org.onosproject.net.device.PortDescription;
 import org.onosproject.net.driver.AbstractHandlerBehaviour;
-import org.onosproject.net.driver.DriverHandler;
 import org.onosproject.netconf.*;
 import org.slf4j.Logger;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.onosproject.net.optical.device.OchPortHelper.ochPortDescription;
-import static org.onosproject.net.optical.device.OduCltPortHelper.oduCltPortDescription;
 import static org.slf4j.LoggerFactory.getLogger;
-
-
-
-import org.onosproject.net.DefaultAnnotations;
 import java.util.ArrayList;
-import java.util.List;
 import org.onosproject.net.Port;
-import org.onosproject.net.PortNumber;
 import org.onosproject.net.device.DefaultPortDescription;
 import org.onosproject.net.Device;
 import org.onosproject.net.DeviceId;
@@ -64,10 +40,7 @@ import org.onosproject.net.device.DeviceService;
 
 import org.apache.commons.lang.StringUtils;
 import org.onlab.packet.ChassisId;
-import org.onosproject.net.device.DeviceService;
-import org.onosproject.netconf.ctl.impl.NetconfSessionMinaImpl;
-import org.onosproject.incubator.net.faultmanagement.alarm.AlarmListener;
-import org.onosproject.event.ListenerService;
+
 
 /**
  * Retrieves the ports (que puertos?) from a Altura MXP40gb device via netconf.
@@ -76,8 +49,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         implements DeviceDescriptionDiscovery {
 
     private final Logger log = getLogger(getClass());
-    private TopoAlarmListener topologyListener;
-    private ListenerService topologyService;
+
 
     @Override
     public DeviceDescription discoverDeviceDetails() {
@@ -161,9 +133,9 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
                 details[2], details[3],
                 new ChassisId(), false, DefaultAnnotations.EMPTY);
 
-        topologyListener = new TopoAlarmListener();
-        topologyService.addListener(topologyListener);
+
         return defaultDescription;
+
     }
 
 
@@ -229,8 +201,6 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
                 .build();
         ports.add(host);
 
-
-
         return ports;
     }
 
@@ -277,20 +247,6 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
     private static String serialNumber(String version) {
         String serialNumber = StringUtils.substringBetween(version, "<device_boardId>", "</device_boardId>");
         return serialNumber;
-    }
-
-
-    //internal alarm listener
-    private class TopoAlarmListener implements AlarmListener {
-        @Override
-        public void event(AlarmEvent event) {
-            log.info("PEPEEEEEEEEEEEE");
-            if (true) {
-                log.info("PEPEEEEEEEEEEEE");
-                log.info(event.subject().deviceId().toString());
-
-            }
-        }
     }
 
 }
