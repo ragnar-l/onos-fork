@@ -77,7 +77,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
 
     private final Logger log = getLogger(getClass());
     private TopoAlarmListener topologyListener;
-    protected AlarmService topologyService;
+    private AlarmService topologyService;
 
     @Override
     public DeviceDescription discoverDeviceDetails() {
