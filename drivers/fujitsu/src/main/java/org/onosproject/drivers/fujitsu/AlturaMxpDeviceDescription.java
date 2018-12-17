@@ -41,6 +41,11 @@ import org.onosproject.net.device.DeviceService;
 import org.apache.commons.lang.StringUtils;
 import org.onlab.packet.ChassisId;
 
+import org.onosproject.incubator.net.faultmanagement.alarm.AlarmEvent;
+
+import org.onosproject.incubator.net.faultmanagement.alarm.AlarmListener;
+
+import org.onosproject.incubator.net.faultmanagement.alarm.AlarmService;
 
 /**
  * Retrieves the ports (que puertos?) from a Altura MXP40gb device via netconf.
@@ -49,7 +54,8 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         implements DeviceDescriptionDiscovery {
 
     private final Logger log = getLogger(getClass());
-
+    private final AlarmListener alarmListener = new TopoAlarmListenerr();
+    protected AlarmService alarmService;
 
     @Override
     public DeviceDescription discoverDeviceDetails() {
@@ -134,6 +140,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
                 new ChassisId(), false, DefaultAnnotations.EMPTY);
 
 
+        alarmService.addListener(alarmListener);
         return defaultDescription;
 
     }
@@ -247,6 +254,18 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
     private static String serialNumber(String version) {
         String serialNumber = StringUtils.substringBetween(version, "<device_boardId>", "</device_boardId>");
         return serialNumber;
+    }
+
+
+    //internal alarm listener
+    private class TopoAlarmListenerr implements AlarmListener {
+        @Override
+        public void event(AlarmEvent event) {
+            if (true) {
+                log.info("PEPEEEEEEEEEEEE");
+                log.info(event.subject().deviceId().toString());
+            }
+        }
     }
 
 }
