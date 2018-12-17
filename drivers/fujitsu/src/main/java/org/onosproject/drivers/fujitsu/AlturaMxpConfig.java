@@ -19,6 +19,8 @@ package org.onosproject.drivers.fujitsu;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import org.apache.commons.lang.StringUtils;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.onosproject.incubator.net.faultmanagement.alarm.*;
 import org.onosproject.mastership.MastershipService;
 import org.onosproject.net.Device;
@@ -39,6 +41,7 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.onosproject.drivers.fujitsu.FujitsuVoltXmlUtility.*;
 import static org.slf4j.LoggerFactory.getLogger;
+
 
 /**
  * Implementation to get and set parameters available in vOLT
@@ -69,7 +72,8 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
     private static final String ONU_GEM_STATS = "onu-gem-stats";
     private static final String GEM_STATS = "gem-stats";
     private static final String PASSWORD_PATTERN = "^[a-zA-Z0-9]+$";
-    protected AlarmProviderService providerService;
+
+
 
     @Override
     public String getOnus(String target) {
@@ -624,7 +628,10 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
                     System.currentTimeMillis()).build());
 
         }
-        providerService.updateAlarmList(ncDeviceId, alarms);
+
+
+
+
 
         log.info("PRUEBA");
 
