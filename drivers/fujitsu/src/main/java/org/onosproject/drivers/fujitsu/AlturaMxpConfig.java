@@ -17,15 +17,23 @@
 package org.onosproject.drivers.fujitsu;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import org.apache.commons.lang.StringUtils;
+import org.onosproject.incubator.net.faultmanagement.alarm.*;
 import org.onosproject.mastership.MastershipService;
+import org.onosproject.net.Device;
 import org.onosproject.net.DeviceId;
 import org.onosproject.net.behaviour.MxpConfig;
+import org.onosproject.net.device.DeviceService;
 import org.onosproject.net.driver.AbstractHandlerBehaviour;
 import org.onosproject.net.driver.DriverHandler;
 import org.onosproject.netconf.NetconfController;
 import org.onosproject.netconf.NetconfException;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -61,6 +69,7 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
     private static final String ONU_GEM_STATS = "onu-gem-stats";
     private static final String GEM_STATS = "gem-stats";
     private static final String PASSWORD_PATTERN = "^[a-zA-Z0-9]+$";
+    protected AlarmProviderService providerService;
 
     @Override
     public String getOnus(String target) {
@@ -507,6 +516,8 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
         checkNotNull(controller, "Netconf controller is null");
         String reply = null;
 
+        Boolean vecinopresente = false;
+
         if (!mastershipService.isLocalMaster(ncDeviceId)) {
             log.warn("Not master for {} Use {} to execute command",
                     ncDeviceId,
@@ -514,6 +525,106 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
             return null;
         }
 
+        AlarmService alarmService = this.handler().get(AlarmService.class);
+        Iterator it = alarmService.getActiveAlarms().iterator();
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+
+        /**
+         * Pregunto al dispositivo local quien es su vecino.
+         */
+        reply = null;
+        try {
+            StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+            request.append("<deviceneighbors/>");
+            request.append("</mux-config>");
+
+            reply = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+
+        //obtengo la info del vecino en limpio, sin el resto del xml
+        String vecino = getVecino(reply);
+
+        /**
+         * Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
+         */
+        com.google.common.base.Optional<Device> dev = Iterables.tryFind(
+                deviceService.getAvailableDevices(),
+                input -> input.serialNumber().equals(vecino));
+        if (!dev.isPresent()) {
+            log.info("Device with chassis ID {} does not exist");
+            vecinopresente = false;
+        }
+
+
+        /**
+         * Pregunto al dispositivo local que configuracion tiene.
+         */
+        String local = null;
+        try {
+            StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+            request.append("<tipo_trafico/>");
+            request.append("</mux-config>");
+
+            local = controller
+                    .getDevicesMap()
+                    .get(ncDeviceId)
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+        }
+
+        //obtengo la info de tipo de trafico en limpio, sin el resto del xml
+        local = getTipoTrafico(local);
+
+
+        /**
+         * Pregunto al dispositivo vecino que configuracion tiene.
+         */
+        String vecin = null;
+        try {
+            StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+            request.append("<tipo_trafico/>");
+            request.append("</mux-config>");
+            vecin = controller
+                    .getDevicesMap()
+                    .get(dev.get().id()) //FIX MEEEE, lo tengo que hacer para todos los dispositivos. Aca se hace solo para uno de los vecinos
+                    .getSession()
+                    .get(request.toString(), REPORT_ALL);
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", dev, e);
+        }
+
+        //obtengo la info de tipo de trafico en limpio, sin el resto del xml
+        vecin = getTipoTrafico(vecin);
+
+
+
+        Collection<Alarm> alarms = new ArrayList<>();
+
+        if (local.toString().equals(vecin.toString())) {
+            log.info("SON IGUALESsssssssSSsS");
+            alarms.add(new DefaultAlarm.Builder(AlarmId.alarmId(ncDeviceId, "WARNING CONFIG"),
+                    ncDeviceId, "[--] mux-notify xmlns; Inconsistent config with neighbor "+vecino,
+                    Alarm.SeverityLevel.MINOR,
+                    System.currentTimeMillis()).build());
+        }
+        else {
+            log.info("SON Distintosssssssssss");
+
+            alarms.add(new DefaultAlarm.Builder(AlarmId.alarmId(ncDeviceId, "WARNING CONFIG"),
+                    ncDeviceId, "[ALARM] mux-notify xmlns; Inconsistent config with neighbor "+vecino,
+                    Alarm.SeverityLevel.MINOR,
+                    System.currentTimeMillis()).build());
+
+        }
+        providerService.updateAlarmList(ncDeviceId, alarms);
 
         try {
             StringBuilder request = new StringBuilder("<mux-apply-config xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
@@ -645,6 +756,29 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
             return false;
         }
         return true;
+    }
+
+
+    /**
+     * Retrieving serial number version of device.
+     * @param version the return of show version command
+     * @return the serial number of the device
+     */
+    private String getVecino(String version) {
+        log.info(version);
+        String serialNumber = StringUtils.substringBetween(version, "<deviceneighbors>", "</deviceneighbors>");
+        return serialNumber;
+    }
+
+    /**
+     * Retrieving serial number version of device.
+     * @param version the return of show version command
+     * @return the serial number of the device
+     */
+    private String getTipoTrafico(String version) {
+        log.info(version);
+        String serialNumber = StringUtils.substringBetween(version, "<tipo_trafico>", "</tipo_trafico>");
+        return serialNumber;
     }
 
 }

@@ -41,12 +41,6 @@ import org.onosproject.net.device.DeviceService;
 import org.apache.commons.lang.StringUtils;
 import org.onlab.packet.ChassisId;
 
-import org.onosproject.incubator.net.faultmanagement.alarm.AlarmEvent;
-
-import org.onosproject.incubator.net.faultmanagement.alarm.AlarmListener;
-
-import org.onosproject.incubator.net.faultmanagement.alarm.AlarmService;
-
 /**
  * Retrieves the ports (que puertos?) from a Altura MXP40gb device via netconf.
  */
