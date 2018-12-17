@@ -60,179 +60,20 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
 
     @Override
     public List<Alarm> consumeAlarms() {
-        DriverHandler handler = handler();
-        NetconfController controller = handler.get(NetconfController.class);
-        MastershipService mastershipService = handler.get(MastershipService.class);
-        ncDeviceId = handler.data().deviceId();
-        checkNotNull(controller, "Netconf controller is null");
-
-
-        List<Alarm> alarms = new ArrayList<>();
-        if (!mastershipService.isLocalMaster(ncDeviceId)) {
-            log.warn("Not master for {} Use {} to execute command",
-                    ncDeviceId,
-                    mastershipService.getMasterFor(ncDeviceId));
-            return alarms;
-        }
-
-
-        AlarmService alarmService = this.handler().get(AlarmService.class);
-        Iterator it = alarmService.getActiveAlarms().iterator();
-
-        DeviceService deviceService = this.handler().get(DeviceService.class);
-
-/*
-        while (it.hasNext()) {
-            Alarm b = (Alarm) it.next();
-            Device localdevice = deviceService.getDevice(b.deviceId());
-            if ((localdevice.manufacturer().equals("ALTURA")) && (b.description().contains("netconf-session-start") || b.description().contains("netconf-session-end") || b.description().contains("netconf-config-change") ) ) {
-                alarmService.remove(b.id());
-                log.info("ELIMINO");
-            }
-        }
-
-*/
-
-        /**
-         * Tengo que esperar hasta que el dispositivo se conecte con ONOS.
-         * Una vez se conecte, ONOS consulta por la descripcion del dispositivo. Si el mismo es OTN, puedo seguir en getLinks.
-         * De lo contrario, retorno null.
-         */
-        Device localdevice = deviceService.getDevice(ncDeviceId);
-
-        if ( (localdevice.swVersion().equals("1.0")) && (localdevice.type().toString().equals("OTN")) ) {
-            log.debug("Dispositivo listo");
-        }
-        else{
-            log.debug("Dispositivo no listo");
-            return alarms;
-        }
-
-
-        /**
-         * Pregunto al dispositivo local quien es su vecino.
-         */
-        String reply = null;
-        try {
-            StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
-            request.append("<deviceneighbors/>");
-            request.append("</mux-config>");
-
-            reply = controller
-                    .getDevicesMap()
-                    .get(ncDeviceId)
-                    .getSession()
-                    .get(request.toString(), REPORT_ALL);
-        } catch (NetconfException e) {
-            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
-        }
-
-        //obtengo la info del vecino en limpio, sin el resto del xml
-        String vecino = getVecino(reply);
-
-
-
-        /**
-         * Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
-         */
-        com.google.common.base.Optional<Device> dev = Iterables.tryFind(
-                deviceService.getAvailableDevices(),
-                input -> input.serialNumber().equals(vecino));
-        if (!dev.isPresent()) {
-            log.info("Device with chassis ID {} does not exist");
-            return alarms;
-        }
-
-
-        /**
-         * Pregunto al dispositivo local que configuracion tiene.
-         */
-        String local = null;
-        try {
-            StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
-            request.append("<tipo_trafico/>");
-            request.append("</mux-config>");
-
-            local = controller
-                    .getDevicesMap()
-                    .get(ncDeviceId)
-                    .getSession()
-                    .get(request.toString(), REPORT_ALL);
-        } catch (NetconfException e) {
-            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
-        }
-
-        //obtengo la info de tipo de trafico en limpio, sin el resto del xml
-        local = getTipoTrafico(local);
-
-
-        /**
-         * Pregunto al dispositivo vecino que configuracion tiene.
-         */
-        String vecin = null;
-        try {
-            StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
-            request.append("<tipo_trafico/>");
-            request.append("</mux-config>");
-            vecin = controller
-                    .getDevicesMap()
-                    .get(dev.get().id()) //FIX MEEEE, lo tengo que hacer para todos los dispositivos. Aca se hace solo para uno de los vecinos
-                    .getSession()
-                    .get(request.toString(), REPORT_ALL);
-        } catch (NetconfException e) {
-            log.error("Cannot communicate to device {} exception {}", dev, e);
-        }
-
-        //obtengo la info de tipo de trafico en limpio, sin el resto del xml
-        vecin = getTipoTrafico(vecin);
 
 
 
 
-        if (local.toString().equals(vecin.toString())) {
-            log.info("SON IGUALESsssssssSSsS");
-            alarms.add(new DefaultAlarm.Builder(AlarmId.alarmId(ncDeviceId, "WARNING CONFIG"),
-                    ncDeviceId, "[--] mux-notify xmlns; Inconsistent config with neighbor "+vecino,
-                    SeverityLevel.MINOR,
-                    System.currentTimeMillis()).build());
-        }
-        else {
-            log.info("SON Distintosssssssssss");
 
-            alarms.add(new DefaultAlarm.Builder(AlarmId.alarmId(ncDeviceId, "WARNING CONFIG"),
-                    ncDeviceId, "[ALARM] mux-notify xmlns; Inconsistent config with neighbor "+vecino,
-                    SeverityLevel.MINOR,
-                    System.currentTimeMillis()).build());
-
-        }
 
         log.info("SALGO");
 
 
-        return alarms;
-    }
-
-    /**
-     * Retrieving serial number version of device.
-     * @param version the return of show version command
-     * @return the serial number of the device
-     */
-    private String getVecino(String version) {
-        log.info(version);
-        String serialNumber = StringUtils.substringBetween(version, "<deviceneighbors>", "</deviceneighbors>");
-        return serialNumber;
-    }
-
-    /**
-     * Retrieving serial number version of device.
-     * @param version the return of show version command
-     * @return the serial number of the device
-     */
-    private String getTipoTrafico(String version) {
-        log.info(version);
-        String serialNumber = StringUtils.substringBetween(version, "<tipo_trafico>", "</tipo_trafico>");
-        return serialNumber;
+        return null;
     }
 
 
-}
+    }
+
+
+
