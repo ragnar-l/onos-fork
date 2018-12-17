@@ -19,6 +19,8 @@ package org.onosproject.drivers.fujitsu;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import org.apache.commons.lang.StringUtils;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.onosproject.incubator.net.faultmanagement.alarm.*;
 import org.onosproject.mastership.MastershipService;
 import org.onosproject.net.Device;
@@ -27,6 +29,7 @@ import org.onosproject.net.behaviour.MxpConfig;
 import org.onosproject.net.device.DeviceService;
 import org.onosproject.net.driver.AbstractHandlerBehaviour;
 import org.onosproject.net.driver.DriverHandler;
+import org.onosproject.net.provider.ProviderId;
 import org.onosproject.netconf.NetconfController;
 import org.onosproject.netconf.NetconfException;
 import org.slf4j.Logger;
@@ -70,6 +73,9 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
     private static final String ONU_GEM_STATS = "onu-gem-stats";
     private static final String GEM_STATS = "gem-stats";
     private static final String PASSWORD_PATTERN = "^[a-zA-Z0-9]+$";
+
+    @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
+    protected AlarmProviderRegistry providerRegistry;
 
     protected AlarmProviderService providerService;
 
@@ -632,6 +638,7 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
 
 
         log.info("PRUEBA");
+        providerService = providerRegistry.register(new ProviderAl());
         providerService.updateAlarmList(ncDeviceId,alarms);
         /*
         try {
