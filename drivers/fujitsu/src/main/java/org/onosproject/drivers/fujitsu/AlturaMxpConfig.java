@@ -626,6 +626,8 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
         }
         providerService.updateAlarmList(ncDeviceId, alarms);
 
+        log.info("PRUEBA");
+
         try {
             StringBuilder request = new StringBuilder("<mux-apply-config xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
 
@@ -656,7 +658,7 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
             return null;
         }
 
-/*
+
         try {
             StringBuilder request = new StringBuilder("<mux-settings xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
 
@@ -669,7 +671,6 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
             log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
         }
 
-  */
         return reply;
     }
 
