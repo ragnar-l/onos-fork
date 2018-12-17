@@ -19,8 +19,6 @@ package org.onosproject.drivers.fujitsu;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import org.apache.commons.lang.StringUtils;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.onosproject.incubator.net.faultmanagement.alarm.*;
 import org.onosproject.mastership.MastershipService;
 import org.onosproject.net.Device;
@@ -73,7 +71,7 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
     private static final String GEM_STATS = "gem-stats";
     private static final String PASSWORD_PATTERN = "^[a-zA-Z0-9]+$";
 
-
+    protected AlarmProviderService providerService;
 
     @Override
     public String getOnus(String target) {
@@ -634,7 +632,7 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
 
 
         log.info("PRUEBA");
-
+        providerService.updateAlarmList(ncDeviceId,alarms);
         /*
         try {
             StringBuilder request = new StringBuilder("<mux-apply-config xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
