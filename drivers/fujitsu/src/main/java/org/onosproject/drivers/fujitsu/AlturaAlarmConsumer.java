@@ -81,7 +81,7 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
 
         DeviceService deviceService = this.handler().get(DeviceService.class);
 
-
+/*
         while (it.hasNext()) {
             Alarm b = (Alarm) it.next();
             Device localdevice = deviceService.getDevice(b.deviceId());
@@ -91,7 +91,7 @@ public class AlturaAlarmConsumer extends AbstractHandlerBehaviour implements Ala
             }
         }
 
-
+*/
 
         /**
          * Tengo que esperar hasta que el dispositivo se conecte con ONOS.
