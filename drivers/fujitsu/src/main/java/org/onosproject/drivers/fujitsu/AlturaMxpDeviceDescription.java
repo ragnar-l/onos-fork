@@ -54,8 +54,6 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         implements DeviceDescriptionDiscovery {
 
     private final Logger log = getLogger(getClass());
-    private final AlarmListener alarmListener = new TopoAlarmListenerr();
-    protected AlarmService alarmService;
 
     @Override
     public DeviceDescription discoverDeviceDetails() {
@@ -140,7 +138,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
                 new ChassisId(), false, DefaultAnnotations.EMPTY);
 
 
-        alarmService.addListener(alarmListener);
+
         return defaultDescription;
 
     }
@@ -257,15 +255,6 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
     }
 
 
-    //internal alarm listener
-    private class TopoAlarmListenerr implements AlarmListener {
-        @Override
-        public void event(AlarmEvent event) {
-            if (true) {
-                log.info("PEPEEEEEEEEEEEE");
-                log.info(event.subject().deviceId().toString());
-            }
-        }
-    }
+
 
 }
