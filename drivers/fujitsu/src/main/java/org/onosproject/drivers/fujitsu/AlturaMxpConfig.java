@@ -638,8 +638,8 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
 
 
         log.info("PRUEBA");
-        providerService = providerRegistry.register(new ProviderAl());
-        providerService.updateAlarmList(ncDeviceId,alarms);
+        ProviderAl holu = new ProviderAl();
+        holu.triggerProbes(ncDeviceId,alarms);
         /*
         try {
             StringBuilder request = new StringBuilder("<mux-apply-config xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");

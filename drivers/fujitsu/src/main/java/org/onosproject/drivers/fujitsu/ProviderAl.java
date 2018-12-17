@@ -84,11 +84,8 @@ public class ProviderAl extends AbstractProvider implements AlarmProvider {
 
 
     public ProviderAl() {
-        super(new ProviderId("default", "org.onosproject.core"));
-    }
 
-    @Activate
-    public void activate(ComponentContext context) {
+        super(new ProviderId("default", "org.onosproject.core"));
         cfgService.registerProperties(getClass());
 
 
@@ -97,6 +94,8 @@ public class ProviderAl extends AbstractProvider implements AlarmProvider {
 
         log.info("Started");
     }
+
+
 
 
 
