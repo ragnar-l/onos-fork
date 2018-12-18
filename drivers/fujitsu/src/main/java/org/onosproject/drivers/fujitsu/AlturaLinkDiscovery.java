@@ -253,7 +253,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         while (prueba.contains("deviceneighbors")) {
             String serialNumber = StringUtils.substringBetween(prueba, "<deviceneighbors>", "</deviceneighbors>");
             list.add(serialNumber);
-            serialNumber.replaceFirst("<deviceneighbors>.*?</deviceneighbors>", "");
+            prueba.replaceFirst("<deviceneighbors>.*?</deviceneighbors>", "");
         }
         return list;
     }
