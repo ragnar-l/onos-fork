@@ -32,6 +32,10 @@ import org.apache.commons.lang.StringUtils;
 import org.onosproject.incubator.net.faultmanagement.alarm.AlarmService;
 import org.onosproject.incubator.net.faultmanagement.alarm.Alarm;
 
+import java.util.ArrayList;
+import java.util.ListIterator;
+
+
 public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         implements LinkDiscovery {
 
@@ -140,11 +144,11 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                 }
                 if (presenceOfModule(reply).equals("Yes")) {
                     DeviceId localDeviceId = this.handler().data().deviceId();
-                    Port localPort = deviceService.getPorts(localDeviceId).get(1);
+                    Port localPort = deviceService.getPorts(localDeviceId).get(4);
                     ConnectPoint local = new ConnectPoint(localDeviceId, localPort.number());
 
                     Device remoteDevice = dev.get();
-                    Port remotePort = deviceService.getPorts(remoteDevice.id()).get(1); // el puerto con el que formo el enlace vecino.
+                    Port remotePort = deviceService.getPorts(remoteDevice.id()).get(4); // el puerto con el que formo el enlace vecino.
                     ConnectPoint remote = new ConnectPoint(remoteDevice.id(), remotePort.number());
                     DefaultAnnotations annotations = DefaultAnnotations.builder().set("layer", "IP").build();
                     descs.add(new DefaultLinkDescription(
@@ -177,20 +181,26 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         }
 
 
-        DeviceId localDeviceId = this.handler().data().deviceId();
-        Port localPort = deviceService.getPorts(localDeviceId).get(0);
 
-        String vecino = serialNumber(reply);
+
+        ArrayList<String> vecino = serialNumber(reply);
+
+        ListIterator<String> listIterator = vecino.listIterator();
 
         log.info("MI VECINO ESSSSSSSSSSSSS");
-        log.info(vecino);
+        int p = 0;
+        while (listIterator.hasNext()){
+            DeviceId localDeviceId = this.handler().data().deviceId();
+        Port localPort = deviceService.getPorts(localDeviceId).get(p);
+        String pru = listIterator.next();
+        log.info(pru);
 
         /**
          * Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
          */
         dev = Iterables.tryFind(
                 deviceService.getAvailableDevices(),
-                input -> input.serialNumber().equals(vecino));
+                input -> input.serialNumber().equals(pru));
         if (!dev.isPresent()) {
             log.info("Device with chassis ID {} does not exist");
             return descs;
@@ -215,7 +225,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         }
 
         Device remoteDevice = dev.get();
-        Port remotePort = deviceService.getPorts(remoteDevice.id()).get(0); // el puerto con el que formo el enlace vecino.
+        Port remotePort = deviceService.getPorts(remoteDevice.id()).get(p); // el puerto con el que formo el enlace vecino.
 
         ConnectPoint local = new ConnectPoint(localDeviceId, localPort.number());
         ConnectPoint remote = new ConnectPoint(remoteDevice.id(), remotePort.number());
@@ -224,6 +234,8 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
 
         descs.add(new DefaultLinkDescription(
                 local, remote, Link.Type.OPTICAL, false, annotations));
+        p = p +1;
+        }
 
         return descs;
     }
@@ -234,10 +246,16 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
      * @param version the return of show version command
      * @return the serial number of the device
      */
-    private String serialNumber(String version) {
+    private ArrayList<String> serialNumber(String version) {
         log.info(version);
-        String serialNumber = StringUtils.substringBetween(version, "<deviceneighbors>", "</deviceneighbors>");
-        return serialNumber;
+        String prueba = version;
+        ArrayList<String> list= new ArrayList<String>();
+        while (prueba.contains("deviceneighbors")) {
+            String serialNumber = StringUtils.substringBetween(prueba, "<deviceneighbors>", "</deviceneighbors>");
+            list.add(serialNumber);
+            serialNumber.replaceFirst("<deviceneighbors>.*?</deviceneighbors>", "");
+        }
+        return list;
     }
 
     /**
