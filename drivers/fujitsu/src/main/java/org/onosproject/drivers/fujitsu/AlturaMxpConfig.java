@@ -29,7 +29,6 @@ import org.onosproject.net.behaviour.MxpConfig;
 import org.onosproject.net.device.DeviceService;
 import org.onosproject.net.driver.AbstractHandlerBehaviour;
 import org.onosproject.net.driver.DriverHandler;
-import org.onosproject.net.provider.ProviderId;
 import org.onosproject.netconf.NetconfController;
 import org.onosproject.netconf.NetconfException;
 import org.slf4j.Logger;
@@ -617,14 +616,14 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
         Collection<Alarm> alarms = new ArrayList<>();
 
         if (local.toString().equals(vecin.toString())) {
-            log.info("SON IGUALESsssssssSSsS");
+            log.info("Misma configuracion, se elimina alarma");
             alarms.add(new DefaultAlarm.Builder(AlarmId.alarmId(ncDeviceId, "WARNING CONFIG"),
                     ncDeviceId, "[--] mux-notify xmlns; Inconsistent config with neighbor "+vecino,
                     Alarm.SeverityLevel.MINOR,
                     System.currentTimeMillis()).build());
         }
         else {
-            log.info("SON Distintosssssssssss");
+            log.info("Distinta configuracion, se crea alarma");
 
             alarms.add(new DefaultAlarm.Builder(AlarmId.alarmId(ncDeviceId, "WARNING CONFIG"),
                     ncDeviceId, "[ALARM] mux-notify xmlns; Inconsistent config with neighbor "+vecino,
@@ -637,9 +636,9 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
 
 
 
+
         log.info("PRUEBA");
-        ProviderAl holu = new ProviderAl();
-        holu.triggerProbes(ncDeviceId,alarms);
+
         /*
         try {
             StringBuilder request = new StringBuilder("<mux-apply-config xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");

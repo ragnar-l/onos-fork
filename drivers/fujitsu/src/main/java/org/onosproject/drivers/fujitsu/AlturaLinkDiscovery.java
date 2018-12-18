@@ -64,7 +64,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
          * De lo contrario, retorno null.
          */
 
-        if ( (localdevice.swVersion().equals("1.0")) && (localdevice.type().toString().equals("OTN")) ) {
+        if ( (localdevice.swVersion().equals("1.0") || localdevice.swVersion().equals("2.0")) && (localdevice.type().toString().equals("OTN")) ) {
             log.debug("SON IGUALES");
         }
         else{
