@@ -182,6 +182,8 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
 
         String vecino = serialNumber(reply);
 
+        log.info("MI VECINO ESSSSSSSSSSSSS");
+        log.info(vecino);
 
         /**
          * Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
