@@ -98,7 +98,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                 log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
             }
 
-            log.info(reply);
+
 
             ArrayList<AlturaMxpPuertos> lista_puertos = puertos(reply);
 
@@ -163,8 +163,12 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
 
             String info = StringUtils.substringBetween(parse, "<ports>", "</ports>"); // a esto tengo que sacar la info sobre puerto, vecino y puerto vecino
 
+            log.info(info);log.info(info);
+
             String info_nombre_puerto = StringUtils.substringBetween(info, "<port>", "</port>");
             p.setPuerto(Integer.valueOf(info_nombre_puerto));
+            //log.info(info_nombre_puerto);
+            //log.info( p.getPuerto() );
 
             String info_nombre_vecino = StringUtils.substringBetween(info, "<neighbor>", "</neighbor>");
             p.setPuerto(Integer.valueOf(info_nombre_puerto));
@@ -172,6 +176,8 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
             String info_nombre_puerto_vecino = StringUtils.substringBetween(info, "<port_neighbor>", "</port_neighbor>");
             p.setPuerto(Integer.valueOf(info_nombre_puerto));
 
+
+            log.info("Salgoooo");
 
             parse = parse.replaceFirst("<ports>.*?</ports>", "");
 
