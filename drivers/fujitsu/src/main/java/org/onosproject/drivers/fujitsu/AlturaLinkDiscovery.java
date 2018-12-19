@@ -118,7 +118,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                      */
                     com.google.common.base.Optional<Device> dev = Iterables.tryFind(
                             deviceService.getAvailableDevices(),
-                            input -> input.serialNumber().equals(p.getVecino()));
+                            input -> input.serialNumber().equals( Integer.toString(p.getVecino())) );
                     if (!dev.isPresent()) {
                         log.info("Device with chassis ID {} does not exist");
                         continue aLoopName;
