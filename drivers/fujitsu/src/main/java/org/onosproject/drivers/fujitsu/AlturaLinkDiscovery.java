@@ -107,8 +107,6 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                 ListIterator<AlturaMxpPuertos> puertosIterator = lista_puertos.listIterator();
                 log.info("NO ESTA VACIO");
 
-
-
                 aLoopName: while ( puertosIterator.hasNext() ) {
 
                     AlturaMxpPuertos p = puertosIterator.next();
@@ -147,11 +145,13 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                             }
 
                             if ( presenceOfModule(reply).equals("Yes") ) {
+
+
                                 Port localPort = deviceService.getPorts(localDeviceId).get(p.getPuerto());
                                 ConnectPoint local = new ConnectPoint(localDeviceId, localPort.number());
 
                                 Device remoteDevice = dev.get();
-                                Port remotePort = deviceService.getPorts(remoteDevice.id()).get(3);
+                                Port remotePort = deviceService.getPorts(remoteDevice.id()).get(p.getPuertoVecino());
                                 ConnectPoint remote = new ConnectPoint(remoteDevice.id(), remotePort.number());
 
                                 DefaultAnnotations annotations = DefaultAnnotations.builder().set("layer", "IP").build();
@@ -159,13 +159,9 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                                         local, remote, Link.Type.OPTICAL, false, annotations));
                                 descs.add(new DefaultLinkDescription(
                                         remote, local, Link.Type.OPTICAL, false, annotations));
-
                             }
-
                         }
-
                         continue aLoopName;
-
                     }
 
                     /**
@@ -215,6 +211,23 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
     }
 
 
+    /**
+     * Retrieving serial number version of device.
+     * @param version the return of show version command
+     * @return the serial number of the device
+     */
+    private ArrayList<String> serialNumber(String version) {
+        log.info(version);
+        String prueba = version;
+        ArrayList<String> list= new ArrayList<String>();
+        while (prueba.contains("deviceneighbors")) {
+            String serialNumber = StringUtils.substringBetween(prueba, "<deviceneighbors>", "</deviceneighbors>");
+            list.add(serialNumber);
+            prueba = prueba.replaceFirst("<deviceneighbors>.*?</deviceneighbors>", "");
+            log.info(prueba);
+        }
+        return list;
+    }
 
     /**
      * Retrieving serial number version of device.
