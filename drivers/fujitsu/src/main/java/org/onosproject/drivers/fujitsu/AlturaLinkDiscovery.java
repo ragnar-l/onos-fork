@@ -106,7 +106,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
             if ( !lista_puertos.isEmpty() ) {
                 ListIterator<AlturaMxpPuertos> puertosIterator = lista_puertos.listIterator();
                 log.info("NO ESTA VACIO");
-                
+
                 aLoopName: while ( puertosIterator.hasNext() ) {
                     AlturaMxpPuertos p = puertosIterator.next();
                     log.info("El puerto es {}", p.getPuerto() );
