@@ -108,19 +108,69 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                 log.info("NO ESTA VACIO");
 
                 aLoopName: while ( puertosIterator.hasNext() ) {
+
                     AlturaMxpPuertos p = puertosIterator.next();
                     log.info("El puerto es {}", p.getPuerto() );
                     log.info("El vecino es {}", p.getVecino() );
                     log.info("El puerto vecino es {}", p.getPuertoVecino() );
+
+                    if ( (p.getVecino() == 1) || (p.getVecino() == 2) ) {
+
+                        /**
+                         * Se busca el of:x
+                         */
+                        com.google.common.base.Optional<Device> dev = Iterables.tryFind(
+                                deviceService.getAvailableDevices(),
+                                input -> input.id().toString().equals("of:000000000000000"+Integer.toString(p.getVecino())));
+
+                        if (!dev.isPresent()) {
+                            log.info("no esta el of:"+Integer.toString(p.getVecino()));
+                        }
+
+                        else {
+
+                            try {
+                                StringBuilder request = new StringBuilder("<mux-state-XFP1 xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+                                request.append("<Presence/>");
+                                request.append("</mux-state-XFP1>");
+
+                                reply = controller
+                                        .getDevicesMap()
+                                        .get(ncDeviceId)
+                                        .getSession()
+                                        .get(request.toString(), REPORT_ALL);
+                            } catch (NetconfException e) {
+                                log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+                            }
+
+                            if ( presenceOfModule(reply).equals("Yes") ) {
+
+
+                                Port localPort = deviceService.getPorts(localDeviceId).get(p.getPuerto());
+                                ConnectPoint local = new ConnectPoint(localDeviceId, localPort.number());
+
+                                Device remoteDevice = dev.get();
+                                Port remotePort = deviceService.getPorts(remoteDevice.id()).get(p.getPuertoVecino());
+                                ConnectPoint remote = new ConnectPoint(remoteDevice.id(), remotePort.number());
+
+                                DefaultAnnotations annotations = DefaultAnnotations.builder().set("layer", "IP").build();
+                                descs.add(new DefaultLinkDescription(
+                                        local, remote, Link.Type.OPTICAL, false, annotations));
+                                descs.add(new DefaultLinkDescription(
+                                        remote, local, Link.Type.OPTICAL, false, annotations));
+                            }
+                        }
+                        continue aLoopName;
+                    }
 
                     /**
                      * Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
                      */
                     com.google.common.base.Optional<Device> dev = Iterables.tryFind(
                             deviceService.getAvailableDevices(),
-                            input -> input.serialNumber().equals( Integer.toString(p.getVecino())) );
+                            input -> input.serialNumber().equals( Integer.toString(p.getVecino()) ) );
                     if (!dev.isPresent()) {
-                        log.info("Device with chassis ID {} does not exist");
+                        log.info( "Device with chassis ID {} does not exist", Integer.toString(p.getVecino()) );
                         continue aLoopName;
                     }
 
