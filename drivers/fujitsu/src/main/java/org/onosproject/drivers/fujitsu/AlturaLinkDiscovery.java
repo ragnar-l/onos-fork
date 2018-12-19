@@ -179,7 +179,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
 
 
 
-            parse = parse.replaceFirst("<ports>(.*)</ports>", "");
+            parse = parse.replaceFirst("(?s)<ports>.*?</ports>", "");
 
             log.info(parse);
             log.info("SALGO");
