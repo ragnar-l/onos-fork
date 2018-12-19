@@ -73,9 +73,10 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
 
         if ( !localdevice.type().toString().equals("OTN") ) {
             log.debug("NO SON IGUALES");
-            return descs;
+            return null;
         }
 
+        log.info("LinkDiscovery -- Descubriendo links");
 
         if ( localdevice.swVersion().equals("1.0") || localdevice.swVersion().equals("2.0")  ) {
 
@@ -96,6 +97,8 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
             } catch (NetconfException e) {
                 log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
             }
+
+            log.info(reply);
 
             ArrayList<AlturaMxpPuertos> lista_puertos = puertos(reply);
 
