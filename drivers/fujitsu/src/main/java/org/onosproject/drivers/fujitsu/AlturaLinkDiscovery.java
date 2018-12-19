@@ -163,26 +163,16 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
 
             String info = StringUtils.substringBetween(parse, "<ports>", "</ports>"); // a esto tengo que sacar la info sobre puerto, vecino y puerto vecino
 
-
-
             String info_nombre_puerto = StringUtils.substringBetween(info, "<port>", "</port>");
             p.setPuerto(Integer.valueOf(info_nombre_puerto));
-            //log.info(info_nombre_puerto);
-            //log.info( p.getPuerto() );
 
             String info_nombre_vecino = StringUtils.substringBetween(info, "<neighbor>", "</neighbor>");
-            p.setPuerto(Integer.valueOf(info_nombre_puerto));
+            p.setPuerto(Integer.valueOf(info_nombre_vecino));
 
             String info_nombre_puerto_vecino = StringUtils.substringBetween(info, "<port_neighbor>", "</port_neighbor>");
-            p.setPuerto(Integer.valueOf(info_nombre_puerto));
-
-
-
+            p.setPuerto(Integer.valueOf(info_nombre_puerto_vecino));
 
             parse = parse.replaceFirst("(?s)<ports>.*?</ports>", "");
-
-            log.info(parse);
-            log.info("SALGO");
 
             lista_puertos.add(p);
         }
