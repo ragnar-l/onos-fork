@@ -151,7 +151,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                                 ConnectPoint local = new ConnectPoint(localDeviceId, localPort.number());
 
                                 Device remoteDevice = dev.get();
-                                Port remotePort = deviceService.getPorts(remoteDevice.id()).get(3);
+                                Port remotePort = deviceService.getPorts(remoteDevice.id()).get(0);
                                 ConnectPoint remote = new ConnectPoint(remoteDevice.id(), remotePort.number());
 
                                 DefaultAnnotations annotations = DefaultAnnotations.builder().set("layer", "IP").build();
