@@ -101,15 +101,55 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
 
 
             ArrayList<AlturaMxpPuertos> lista_puertos = puertos(reply);
+            DeviceId localDeviceId = this.handler().data().deviceId();
 
             if ( !lista_puertos.isEmpty() ) {
                 ListIterator<AlturaMxpPuertos> puertosIterator = lista_puertos.listIterator();
                 log.info("NO ESTA VACIO");
-                while ( puertosIterator.hasNext() ){
+                
+                aLoopName: while ( puertosIterator.hasNext() ) {
                     AlturaMxpPuertos p = puertosIterator.next();
                     log.info("El puerto es {}", p.getPuerto() );
                     log.info("El vecino es {}", p.getVecino() );
                     log.info("El puerto vecino es {}", p.getPuertoVecino() );
+
+                    /**
+                     * Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
+                     */
+                    com.google.common.base.Optional<Device> dev = Iterables.tryFind(
+                            deviceService.getAvailableDevices(),
+                            input -> input.serialNumber().equals(p.getVecino()));
+                    if (!dev.isPresent()) {
+                        log.info("Device with chassis ID {} does not exist");
+                        continue aLoopName;
+                    }
+
+                    /**
+                     * Tengo que ver si el dispositivo local tiene alarmas referidas al enlace.
+                     * Si las tiene, no armo enlace.
+                     */
+                    AlarmService alarmService = this.handler().get(AlarmService.class);
+                    try {
+                        for ( Alarm a : alarmService.getAlarms(localDeviceId)) {
+                            if ( (a.id().toString().contains("RXS")) || (a.id().toString().contains("Rx LOCK ERR")) ) {
+                                continue aLoopName;
+                            }
+                        }
+                    } catch (Exception e){
+                        log.info("LinkDiscovery ERROR - alarms");
+                    }
+
+                    Device remoteDevice = dev.get();
+                    Port localPort = deviceService.getPorts(localDeviceId).get(p.getPuerto()); // el puerto del local con el que formo el enlace.
+                    Port remotePort = deviceService.getPorts(remoteDevice.id()).get(p.getPuertoVecino()); // el puerto del vecino con el que formo el enlace.
+
+                    ConnectPoint local = new ConnectPoint(localDeviceId, localPort.number());
+                    ConnectPoint remote = new ConnectPoint(remoteDevice.id(), remotePort.number());
+
+                    DefaultAnnotations annotations = DefaultAnnotations.builder().set("layer", "IP").build();
+
+                    descs.add(new DefaultLinkDescription(
+                            local, remote, Link.Type.OPTICAL, false, annotations));
                 }
             }
 
@@ -167,10 +207,10 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
             p.setPuerto(Integer.valueOf(info_nombre_puerto));
 
             String info_nombre_vecino = StringUtils.substringBetween(info, "<neighbor>", "</neighbor>");
-            p.setPuerto(Integer.valueOf(info_nombre_vecino));
+            p.setVecino(Integer.valueOf(info_nombre_vecino));
 
             String info_nombre_puerto_vecino = StringUtils.substringBetween(info, "<port_neighbor>", "</port_neighbor>");
-            p.setPuerto(Integer.valueOf(info_nombre_puerto_vecino));
+            p.setPuertoVecino(Integer.valueOf(info_nombre_puerto_vecino));
 
             parse = parse.replaceFirst("(?s)<ports>.*?</ports>", "");
 
