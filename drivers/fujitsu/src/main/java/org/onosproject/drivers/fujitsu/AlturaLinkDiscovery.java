@@ -235,6 +235,11 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                 }
             }
 
+            else {
+                log.info("Sin vecinos..");
+                return null;
+            }
+
         }
 
 
