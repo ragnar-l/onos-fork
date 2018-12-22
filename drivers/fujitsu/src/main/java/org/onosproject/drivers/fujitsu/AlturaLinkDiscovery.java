@@ -117,8 +117,14 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
 
 
 
-                    /**
+
                     if ( (p.getVecino() == 1) || (p.getVecino() == 2) ) {
+
+                        if ( (p.getPuerto() < 1)) {
+                            log.info("Se esperaba puerto de cliente");
+                            continue aLoopName;
+                        }
+
                         com.google.common.base.Optional<Device> dev = Iterables.tryFind(
                                 deviceService.getAvailableDevices(),
                                 input -> input.id().toString().equals("of:000000000000000"+Integer.toString(p.getVecino())));
@@ -131,9 +137,12 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                         else {
 
                             try {
-                                StringBuilder request = new StringBuilder("<mux-state-XFP1 xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+                                String XFP = "XFP"+Integer.toString(p.getPuerto()-1);
+                                StringBuilder request = new StringBuilder("<mux-state-"+XFP);
+                                request.append(" xmlns=\"http://fulgor.com/ns/cli-mxp\">");
                                 request.append("<Presence/>");
-                                request.append("</mux-state-XFP1>");
+                                request.append("</mux-state-"+XFP+">");
+
 
                                 reply = controller
                                         .getDevicesMap()
@@ -151,7 +160,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                                 ConnectPoint local = new ConnectPoint(localDeviceId, localPort.number());
 
                                 Device remoteDevice = dev.get();
-                                Port remotePort = deviceService.getPorts(remoteDevice.id()).get(0);
+                                Port remotePort = deviceService.getPorts(remoteDevice.id()).stream().findFirst().get();
                                 ConnectPoint remote = new ConnectPoint(remoteDevice.id(), remotePort.number());
 
                                 DefaultAnnotations annotations = DefaultAnnotations.builder().set("layer", "IP").build();
@@ -160,51 +169,69 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                                 descs.add(new DefaultLinkDescription(
                                         remote, local, Link.Type.OPTICAL, false, annotations));
                             }
-                        }
-                        continue aLoopName;
-                    }
-                    **/
 
+                            else {
+                                Port localPort = deviceService.getPorts(localDeviceId).get(p.getPuerto());
+                                ConnectPoint local = new ConnectPoint(localDeviceId, localPort.number());
 
-                    /**
-                     * Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
-                     */
-                    com.google.common.base.Optional<Device> dev = Iterables.tryFind(
-                            deviceService.getAvailableDevices(),
-                            input -> input.serialNumber().equals( Integer.toString( p.getVecino() ) ) );
-
-                    if (!dev.isPresent()) {
-                        log.info( "Device with chassis ID {} does not exist", Integer.toString(p.getVecino()) );
-                        continue aLoopName;
-                    }
-
-                    /**
-                     * Tengo que ver si el dispositivo local tiene alarmas referidas al enlace.
-                     * Si las tiene, no armo enlace.
-                     */
-                    AlarmService alarmService = this.handler().get(AlarmService.class);
-                    try {
-                        for ( Alarm a : alarmService.getAlarms(localDeviceId)) {
-                            if ( (a.id().toString().contains("RXS")) || (a.id().toString().contains("Rx LOCK ERR")) ) {
-                                log.info("-- No se pudo formar el enlace, el dispositivo local contiene alarmas --");
-                                continue aLoopName;
+                                Device remoteDevice = dev.get();
+                                Port remotePort = deviceService.getPorts(remoteDevice.id()).stream().findFirst().get();
+                                DefaultAnnotations annotations = DefaultAnnotations.builder().set("layer", "IP").build();
+                                ConnectPoint remote = new ConnectPoint(remoteDevice.id(), remotePort.number());
+                                descs.add(new DefaultLinkDescription(
+                                        remote, local, Link.Type.OPTICAL, false, annotations));
                             }
                         }
-                    } catch (Exception e){
-                        log.info("LinkDiscovery ERROR - alarms");
+                        continue aLoopName;
                     }
 
-                    Device remoteDevice = dev.get();
-                    Port localPort = deviceService.getPorts(localDeviceId).get(p.getPuerto()); // el puerto del local con el que formo el enlace.
-                    Port remotePort = deviceService.getPorts(remoteDevice.id()).get(p.getPuertoVecino()); // el puerto del vecino con el que formo el enlace.
+                    else {
 
-                    ConnectPoint local = new ConnectPoint(localDeviceId, localPort.number());
-                    ConnectPoint remote = new ConnectPoint(remoteDevice.id(), remotePort.number());
+                        if ( (p.getPuerto() > 1) || (p.getPuertoVecino() > 1)) {
+                            log.info("Se esperaba puerto de linea");
+                            continue aLoopName;
+                        }
 
-                    DefaultAnnotations annotations = DefaultAnnotations.builder().set("layer", "IP").build();
+                        /**
+                         * Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
+                         */
+                        com.google.common.base.Optional<Device> dev = Iterables.tryFind(
+                                deviceService.getAvailableDevices(),
+                                input -> input.serialNumber().equals( Integer.toString( p.getVecino() ) ) );
 
-                    descs.add(new DefaultLinkDescription(
-                            local, remote, Link.Type.OPTICAL, false, annotations));
+                        if (!dev.isPresent()) {
+                            log.info( "Device with chassis ID {} does not exist", Integer.toString(p.getVecino()) );
+                            continue aLoopName;
+                        }
+
+                        /**
+                         * Tengo que ver si el dispositivo local tiene alarmas referidas al enlace.
+                         * Si las tiene, no armo enlace.
+                         */
+                        AlarmService alarmService = this.handler().get(AlarmService.class);
+                        try {
+                            for ( Alarm a : alarmService.getAlarms(localDeviceId)) {
+                                if ( (a.id().toString().contains("RXS")) || (a.id().toString().contains("Rx LOCK ERR")) ) {
+                                    log.info("-- No se pudo formar el enlace, el dispositivo local {} contiene alarmas --", localDeviceId.toString());
+                                    continue aLoopName;
+                                }
+                            }
+                        } catch (Exception e){
+                            log.info("LinkDiscovery ERROR - alarms");
+                        }
+
+                        Device remoteDevice = dev.get();
+                        Port localPort = deviceService.getPorts(localDeviceId).get(p.getPuerto()); // el puerto del local con el que formo el enlace.
+                        Port remotePort = deviceService.getPorts(remoteDevice.id()).get(p.getPuertoVecino()); // el puerto del vecino con el que formo el enlace.
+
+                        ConnectPoint local = new ConnectPoint(localDeviceId, localPort.number());
+                        ConnectPoint remote = new ConnectPoint(remoteDevice.id(), remotePort.number());
+
+                        DefaultAnnotations annotations = DefaultAnnotations.builder().set("layer", "IP").build();
+
+                        descs.add(new DefaultLinkDescription(
+                                local, remote, Link.Type.OPTICAL, false, annotations));
+                    }
                 }
             }
 
