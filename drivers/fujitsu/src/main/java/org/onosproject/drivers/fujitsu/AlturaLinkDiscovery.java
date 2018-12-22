@@ -1,4 +1,7 @@
 package org.onosproject.drivers.fujitsu;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.onosproject.cfg.ComponentConfigService;
 import org.onosproject.net.behaviour.LinkDiscovery;
 
 import java.util.HashSet;
@@ -8,13 +11,13 @@ import java.util.Set;
 import org.onosproject.net.driver.AbstractHandlerBehaviour;
 import org.onosproject.net.ConnectPoint;
 import org.onosproject.net.DefaultAnnotations;
-import org.onosproject.net.DefaultAnnotations.Builder;
 import org.onosproject.net.link.DefaultLinkDescription;
 import org.onosproject.net.Device;
 import org.onosproject.net.DeviceId;
 import org.onosproject.net.Link;
 import org.onosproject.net.link.LinkDescription;
 import org.onosproject.net.Port;
+import org.onosproject.net.link.LinkProviderService;
 import org.slf4j.Logger;
 
 import static org.onosproject.drivers.fujitsu.FujitsuVoltXmlUtility.REPORT_ALL;
@@ -35,12 +38,17 @@ import org.onosproject.incubator.net.faultmanagement.alarm.Alarm;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-import org.onosproject.drivers.fujitsu.AlturaMxpPuertos;
+
 
 public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         implements LinkDiscovery {
 
     private final Logger log = getLogger(getClass());
+
+    private LinkDescription prueba;
+
+    @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
+    protected LinkProviderService providerService;
 
     @Override
     public Set<LinkDescription> getLinks() {
@@ -168,6 +176,9 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                                         local, remote, Link.Type.OPTICAL, false, annotations));
                                 descs.add(new DefaultLinkDescription(
                                         remote, local, Link.Type.OPTICAL, false, annotations));
+
+                                prueba = new DefaultLinkDescription(
+                                        remote, local, Link.Type.OPTICAL, false, annotations);
                             }
 
                             else {
@@ -238,6 +249,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
             else {
                 log.info("Sin vecinos..");
                 descs = new HashSet<>();
+                providerService.linkDetected(prueba);
                 return descs;
             }
 
