@@ -141,6 +141,8 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
     @Override
     public List<PortDescription> discoverPortDetails() {
 
+        log.info("Descubriendo puertos del dispositivo...");
+
         List<PortDescription> ports = new ArrayList<PortDescription>();
 
         DefaultAnnotations annotationOptics = DefaultAnnotations.builder().set(AnnotationKeys.PORT_NAME, "Optico - Tx")
