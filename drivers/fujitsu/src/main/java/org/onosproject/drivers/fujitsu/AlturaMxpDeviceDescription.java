@@ -143,28 +143,31 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
 
         List<PortDescription> ports = new ArrayList<PortDescription>();
 
-        DefaultAnnotations annotationOptics = DefaultAnnotations.builder().set(AnnotationKeys.PORT_NAME, "Optics")
+        DefaultAnnotations annotationOptics = DefaultAnnotations.builder().set(AnnotationKeys.PORT_NAME, "Optico - Tx")
                 .build();
-        PortDescription optics = DefaultPortDescription.builder()
+        PortDescription optic_tx = DefaultPortDescription.builder()
                 .withPortNumber(PortNumber.portNumber(0))
                 .isEnabled(true)
                 .type(Port.Type.FIBER)
                 .portSpeed(1000)
                 .annotations(annotationOptics)
                 .build();
-        ports.add(optics);
 
-        DefaultAnnotations annotationHost = DefaultAnnotations.builder().set(AnnotationKeys.PORT_NAME, "Host").build();
-        PortDescription host = DefaultPortDescription.builder()
+        ports.add(optic_tx);
+
+        annotationOptics = DefaultAnnotations.builder().set(AnnotationKeys.PORT_NAME, "Optico - Rx").build();
+        PortDescription optic_rx = DefaultPortDescription.builder()
                 .withPortNumber(PortNumber.portNumber(1))
                 .isEnabled(true)
-                .type(Port.Type.COPPER)
+                .type(Port.Type.FIBER)
                 .portSpeed(1000)
-                .annotations(annotationHost)
+                .annotations(annotationOptics)
                 .build();
-        ports.add(host);
+        ports.add(optic_rx);
 
-        host = DefaultPortDescription.builder()
+        DefaultAnnotations annotationHost = DefaultAnnotations.builder().set(AnnotationKeys.PORT_NAME, "Cliente 1").build();
+
+        PortDescription host = DefaultPortDescription.builder()
                 .withPortNumber(PortNumber.portNumber(2))
                 .isEnabled(true)
                 .type(Port.Type.COPPER)
@@ -173,6 +176,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
                 .build();
         ports.add(host);
 
+        annotationHost = DefaultAnnotations.builder().set(AnnotationKeys.PORT_NAME, "Cliente 2").build();
         host = DefaultPortDescription.builder()
                 .withPortNumber(PortNumber.portNumber(3))
                 .isEnabled(true)
@@ -182,6 +186,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
                 .build();
         ports.add(host);
 
+        annotationHost = DefaultAnnotations.builder().set(AnnotationKeys.PORT_NAME, "Cliente 3").build();
         host = DefaultPortDescription.builder()
                 .withPortNumber(PortNumber.portNumber(4))
                 .isEnabled(true)
@@ -191,6 +196,8 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
                 .build();
         ports.add(host);
 
+
+        annotationHost = DefaultAnnotations.builder().set(AnnotationKeys.PORT_NAME, "Cliente 4").build();
         host = DefaultPortDescription.builder()
                 .withPortNumber(PortNumber.portNumber(5))
                 .isEnabled(true)

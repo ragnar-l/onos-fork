@@ -76,7 +76,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
             return null;
         }
 
-        log.info("LinkDiscovery -- Descubriendo links");
+        log.info("LinkDiscovery -- Descubriendo links para dispositivo {}", ncDeviceId.toString());
 
         if ( localdevice.swVersion().equals("1.0") || localdevice.swVersion().equals("2.0")  ) {
 
@@ -105,20 +105,20 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
 
             if ( !lista_puertos.isEmpty() ) {
                 ListIterator<AlturaMxpPuertos> puertosIterator = lista_puertos.listIterator();
-                log.info("NO ESTA VACIO");
+                log.info("-- La lista de puertos contiene vecinos --");
 
                 aLoopName: while ( puertosIterator.hasNext() ) {
 
                     AlturaMxpPuertos p = puertosIterator.next();
-                    log.info("El puerto es {}", p.getPuerto() );
+                    log.info("El puerto local es {}", p.getPuerto() );
                     log.info("El vecino es {}", p.getVecino() );
                     log.info("El puerto vecino es {}", p.getPuertoVecino() );
 
-                    if ( (p.getVecino() == 1) || (p.getVecino() == 2) ) {
 
-                        /**
-                         * Se busca el of:x
-                         */
+
+
+                    /**
+                    if ( (p.getVecino() == 1) || (p.getVecino() == 2) ) {
                         com.google.common.base.Optional<Device> dev = Iterables.tryFind(
                                 deviceService.getAvailableDevices(),
                                 input -> input.id().toString().equals("of:000000000000000"+Integer.toString(p.getVecino())));
@@ -163,13 +163,16 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                         }
                         continue aLoopName;
                     }
+                    **/
+
 
                     /**
                      * Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
                      */
                     com.google.common.base.Optional<Device> dev = Iterables.tryFind(
                             deviceService.getAvailableDevices(),
-                            input -> input.serialNumber().equals( Integer.toString(p.getVecino()) ) );
+                            input -> input.serialNumber().equals( Integer.toString( p.getVecino() ) ) );
+
                     if (!dev.isPresent()) {
                         log.info( "Device with chassis ID {} does not exist", Integer.toString(p.getVecino()) );
                         continue aLoopName;
@@ -183,6 +186,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                     try {
                         for ( Alarm a : alarmService.getAlarms(localDeviceId)) {
                             if ( (a.id().toString().contains("RXS")) || (a.id().toString().contains("Rx LOCK ERR")) ) {
+                                log.info("-- No se pudo formar el enlace, el dispositivo local contiene alarmas --");
                                 continue aLoopName;
                             }
                         }
@@ -263,7 +267,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
             String info_nombre_puerto_vecino = StringUtils.substringBetween(info, "<port_neighbor>", "</port_neighbor>");
             p.setPuertoVecino(Integer.valueOf(info_nombre_puerto_vecino));
 
-            parse = parse.replaceFirst("(?s)<ports>.*?</ports>", "");
+            parse = parse.replaceFirst("(?s)<ports>.*?</ports>", ""); // (?s) significa que se aplica a todas las lineas del string.
 
             lista_puertos.add(p);
         }
