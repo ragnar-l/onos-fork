@@ -20,6 +20,9 @@ import org.apache.felix.scr.annotations.Component;
 import org.onosproject.cli.net.DeviceIdCompleter;
 import org.onosproject.net.driver.AbstractDriverLoader;
 import org.onosproject.net.optical.OpticalDevice;
+import org.slf4j.Logger;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Loader for Altura device drivers.
@@ -33,7 +36,10 @@ public class AlturaMxpDriversLoader extends AbstractDriverLoader {
     @SuppressWarnings("unused")
     private DeviceIdCompleter deviceIdCompleter;
 
+    private final Logger log = getLogger(AlturaMxpConfig.class);
+
     public AlturaMxpDriversLoader() {
         super("/altura-drivers.xml");
+        log.info("FujitsuDriversLoader");
     }
 }

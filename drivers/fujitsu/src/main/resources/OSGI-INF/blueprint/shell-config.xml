@@ -96,13 +96,6 @@
         </command>
 
         <command>
-            <action class="org.onosproject.drivers.fujitsu.cli.MxpSetDeviceNeighborsCommand"/>
-            <completers>
-                <ref component-id="deviceIdCompleter"/>
-            </completers>
-        </command>
-
-        <command>
             <action class="org.onosproject.drivers.fujitsu.cli.MxpGetConfigContainerCommand"/>
             <completers>
                 <ref component-id="deviceIdCompleter"/>
@@ -188,6 +181,20 @@
 
         <command>
             <action class="org.onosproject.drivers.fujitsu.cli.MxpSettingsConfigCommand"/>
+            <completers>
+                <ref component-id="deviceIdCompleter"/>
+            </completers>
+        </command>
+
+        <command>
+            <action class="org.onosproject.drivers.fujitsu.cli.MxpReplaceOrCreateNeighbor"/>
+            <completers>
+                <ref component-id="deviceIdCompleter"/>
+            </completers>
+        </command>
+
+        <command>
+            <action class="org.onosproject.drivers.fujitsu.cli.MxpRemoveNeighbor"/>
             <completers>
                 <ref component-id="deviceIdCompleter"/>
             </completers>

@@ -105,6 +105,25 @@ public interface MxpConfig extends HandlerBehaviour {
     String setDeviceNeighbors(String deviceneighbors);
 
     /**
+     * Setea el valor del rx_power a notificar.
+     *
+     * @param local_port puerto local con quien formar vecino
+     * @param neighbor numero de serie del dispositivo vecino
+     * @param remote_port puerto remoto con quien se forma el vecino
+     * @return response string
+     */
+    String createOrReplaceNeighbor(String local_port, String neighbor, String remote_port);
+
+
+    /**
+     * Setea el valor del rx_power a notificar.
+     *
+     * @param puerto puerto del dispositivo local que eliminar
+     * @return response string
+     */
+    String removeNeighbor(String puerto);
+
+    /**
      * Rpc para aplicar configuracion en el MXP.
      *
      * @return response string
