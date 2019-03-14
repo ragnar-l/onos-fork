@@ -19,6 +19,7 @@ package org.onosproject.drivers.fujitsu;
 import org.onosproject.net.behaviour.MxpGetAll;
 import org.onosproject.mastership.MastershipService;
 import org.onosproject.net.DeviceId;
+import org.onosproject.net.device.DeviceService;
 import org.onosproject.net.driver.AbstractHandlerBehaviour;
 import org.onosproject.net.driver.DriverHandler;
 import org.onosproject.netconf.NetconfController;
@@ -53,6 +54,11 @@ public class AlturaMxpGetAll extends AbstractHandlerBehaviour
                     ncDeviceId,
                     mastershipService.getMasterFor(ncDeviceId));
             return null;
+        }
+
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
         }
 
         try {
@@ -97,6 +103,11 @@ public class AlturaMxpGetAll extends AbstractHandlerBehaviour
             return null;
         }
 
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
+        }
+
         try {
             StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
             reply = controller
@@ -124,6 +135,11 @@ public class AlturaMxpGetAll extends AbstractHandlerBehaviour
                     ncDeviceId,
                     mastershipService.getMasterFor(ncDeviceId));
             return null;
+        }
+
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
         }
 
         try {
@@ -155,6 +171,11 @@ public class AlturaMxpGetAll extends AbstractHandlerBehaviour
             return null;
         }
 
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
+        }
+
         try {
             StringBuilder request = new StringBuilder("<mux-state-misc xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
             reply = controller
@@ -182,6 +203,11 @@ public class AlturaMxpGetAll extends AbstractHandlerBehaviour
                     ncDeviceId,
                     mastershipService.getMasterFor(ncDeviceId));
             return null;
+        }
+
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
         }
 
         try {
@@ -213,6 +239,11 @@ public class AlturaMxpGetAll extends AbstractHandlerBehaviour
             return null;
         }
 
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
+        }
+
         try {
             StringBuilder request = new StringBuilder("<mux-state-power xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
             reply = controller
@@ -240,6 +271,11 @@ public class AlturaMxpGetAll extends AbstractHandlerBehaviour
                     ncDeviceId,
                     mastershipService.getMasterFor(ncDeviceId));
             return null;
+        }
+
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
         }
 
         try {
@@ -271,6 +307,11 @@ public class AlturaMxpGetAll extends AbstractHandlerBehaviour
             return null;
         }
 
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
+        }
+
         try {
             StringBuilder request = new StringBuilder("<mux-state-edfa xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
             reply = controller
@@ -298,6 +339,11 @@ public class AlturaMxpGetAll extends AbstractHandlerBehaviour
                     ncDeviceId,
                     mastershipService.getMasterFor(ncDeviceId));
             return null;
+        }
+
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
         }
 
         try {
@@ -329,6 +375,11 @@ public class AlturaMxpGetAll extends AbstractHandlerBehaviour
             return null;
         }
 
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
+        }
+
         try {
             StringBuilder request = new StringBuilder("<mux-state-XFP1 xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
             reply = controller
@@ -356,6 +407,11 @@ public class AlturaMxpGetAll extends AbstractHandlerBehaviour
                     ncDeviceId,
                     mastershipService.getMasterFor(ncDeviceId));
             return null;
+        }
+
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
         }
 
         try {
@@ -387,6 +443,11 @@ public class AlturaMxpGetAll extends AbstractHandlerBehaviour
             return null;
         }
 
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
+        }
+
         try {
             StringBuilder request = new StringBuilder("<mux-state-XFP3 xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
             reply = controller
@@ -414,6 +475,11 @@ public class AlturaMxpGetAll extends AbstractHandlerBehaviour
                     ncDeviceId,
                     mastershipService.getMasterFor(ncDeviceId));
             return null;
+        }
+
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
         }
 
         try {

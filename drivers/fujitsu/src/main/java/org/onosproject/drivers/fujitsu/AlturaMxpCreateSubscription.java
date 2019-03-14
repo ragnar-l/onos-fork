@@ -19,6 +19,7 @@ package org.onosproject.drivers.fujitsu;
 import org.onosproject.net.behaviour.MxpSubscription;
 import org.onosproject.mastership.MastershipService;
 import org.onosproject.net.DeviceId;
+import org.onosproject.net.device.DeviceService;
 import org.onosproject.net.driver.AbstractHandlerBehaviour;
 import org.onosproject.net.driver.DriverHandler;
 import org.onosproject.netconf.NetconfController;
@@ -52,6 +53,11 @@ public class AlturaMxpCreateSubscription extends AbstractHandlerBehaviour
                     ncDeviceId,
                     mastershipService.getMasterFor(ncDeviceId));
             return null;
+        }
+
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
         }
 
         try {

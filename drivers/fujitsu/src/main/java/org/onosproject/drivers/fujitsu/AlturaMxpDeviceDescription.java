@@ -132,6 +132,12 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
                 new ChassisId(), false, DefaultAnnotations.EMPTY);
 
 
+        try {
+            request = new StringBuilder("<mux-notify-activate xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
+            session.doWrappedRpc(request.toString());
+        } catch (NetconfException e) {
+            log.error("Cannot communicate to device {} exception {}", ncDevice, e);
+        }
 
         return defaultDescription;
 

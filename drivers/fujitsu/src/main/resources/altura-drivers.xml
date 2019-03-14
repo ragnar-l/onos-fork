@@ -41,8 +41,5 @@
                    impl="org.onosproject.drivers.fujitsu.AlturaLinkDiscovery"/>
 
 
-        <behaviour api="org.onosproject.incubator.net.faultmanagement.alarm.AlarmConsumer"
-                   impl="org.onosproject.drivers.fujitsu.AlturaAlarmConsumer"/>
-
     </driver>
 </drivers>

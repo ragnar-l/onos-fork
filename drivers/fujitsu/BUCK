@@ -27,6 +27,8 @@ osgi_jar_with_tests (
     resources = glob(['src/main/resources/**']),
 )
 
+
+
 onos_app (
     app_name = 'org.onosproject.drivers.altura',
     title = 'Altura Drivers',
@@ -34,5 +36,5 @@ onos_app (
     url = 'http://onosproject.org',
     description = 'Adds support for Altura devices.',
     included_bundles = BUNDLES,
-    required_apps = [ 'org.onosproject.netconf', 'org.onosproject.optical-model', 'org.onosproject.drivers.optical', 'org.onosproject.linkdiscovery' ],
-)
+    required_apps = [ 'org.onosproject.faultmanagement', 'org.onosproject.netconf', 'org.onosproject.optical-model', 'org.onosproject.drivers.optical', 'org.onosproject.linkdiscovery' ],
+     )

@@ -16,13 +16,12 @@
 
 package org.onosproject.drivers.fujitsu;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.ReferenceCardinality;
-import org.onosproject.incubator.net.faultmanagement.alarm.*;
+import org.onosproject.incubator.net.faultmanagement.alarm.Alarm;
+import org.onosproject.incubator.net.faultmanagement.alarm.AlarmId;
+import org.onosproject.incubator.net.faultmanagement.alarm.AlarmService;
+import org.onosproject.incubator.net.faultmanagement.alarm.DefaultAlarm;
 import org.onosproject.mastership.MastershipService;
 import org.onosproject.net.Device;
 import org.onosproject.net.DeviceId;
@@ -32,21 +31,16 @@ import org.onosproject.net.driver.AbstractHandlerBehaviour;
 import org.onosproject.net.driver.DriverHandler;
 import org.onosproject.netconf.NetconfController;
 import org.onosproject.netconf.NetconfException;
-import org.onosproject.netconf.ctl.impl.NetconfStreamHandler;
 import org.slf4j.Logger;
-import org.onosproject.store.service.StorageService;
-import java.util.*;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.onosproject.drivers.fujitsu.FujitsuVoltXmlUtility.*;
 import static org.slf4j.LoggerFactory.getLogger;
-
-
-
-
-import org.onosproject.netconf.ctl.impl.NetconfSessionMinaImpl;
-import org.onosproject.netconf.*;
 
 /**
  * Implementation to get and set parameters available in vOLT
@@ -56,97 +50,11 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
         implements MxpConfig {
 
     private final Logger log = getLogger(AlturaMxpConfig.class);
-    private static final String ADMIN_STATE = "admin-state";
-    private static final String PASSWORD = "password";
-    private static final Set<String> ONUCONFIGPARAMS =
-            ImmutableSet.of(ADMIN_STATE, "pm-enable", "fec-enable", "security-enable", PASSWORD);
-    private static final Set<String> ADMINSTATES =
-            ImmutableSet.of("enable", "disable");
-    private static final Set<String> ENABLES =
-            ImmutableSet.of("true", "false");
-    private static final String VOLT_ONUS = "volt-onus";
-    private static final String ONUS_PERLINK = "onus-perlink";
-    private static final String ONUS_LIST = "onus-list";
-    private static final String ONU_INFO = "onu-info";
-    private static final String ONU_SET_CONFIG = "onu-set-config";
-    private static final String CONFIG_INFO = "config-info";
-    private static final String VOLT_STATISTICS = "volt-statistics";
-    private static final String ONU_STATISTICS = "onu-statistics";
-    private static final String ONU_ETH_STATS = "onu-eth-stats";
-    private static final String ETH_STATS = "eth-stats";
-    private static final String ONU_GEM_STATS = "onu-gem-stats";
-    private static final String GEM_STATS = "gem-stats";
-    private static final String PASSWORD_PATTERN = "^[a-zA-Z0-9]+$";
-
-
-    protected AlarmProviderService providerService;
-    protected AlturaProvider providerAltura;
-
-    @Override
-    public String getOnus(String target) {
-        DriverHandler handler = handler();
-        NetconfController controller = handler.get(NetconfController.class);
-        MastershipService mastershipService = handler.get(MastershipService.class);
-        DeviceId ncDeviceId = handler.data().deviceId();
-        checkNotNull(controller, "Netconf controller is null");
-        String reply = null;
-        String[] onuId = null;
-
-        if (!mastershipService.isLocalMaster(ncDeviceId)) {
-            log.warn("Not master for {} Use {} to execute command",
-                     ncDeviceId,
-                     mastershipService.getMasterFor(ncDeviceId));
-            return null;
-        }
-
-        if (target != null) {
-            onuId = checkIdString(target);
-            if (onuId == null) {
-                log.error("Invalid ONU identifier {}", target);
-                return null;
-            }
-        }
-
-        try {
-            StringBuilder request = new StringBuilder();
-            request.append(VOLT_NE_OPEN + VOLT_NE_NAMESPACE);
-            request.append(ANGLE_RIGHT + NEW_LINE);
-            if (onuId != null) {
-                request.append(buildStartTag(VOLT_ONUS))
-                    .append(buildStartTag(ONUS_PERLINK))
-                    .append(buildStartTag(PONLINK_ID, false))
-                    .append(onuId[FIRST_PART])
-                    .append(buildEndTag(PONLINK_ID));
-                if (onuId.length > ONE) {
-                    request.append(buildStartTag(ONUS_LIST))
-                        .append(buildStartTag(ONU_INFO))
-                        .append(buildStartTag(ONU_ID, false))
-                        .append(onuId[SECOND_PART])
-                        .append(buildEndTag(ONU_ID))
-                        .append(buildEndTag(ONU_INFO))
-                        .append(buildEndTag(ONUS_LIST));
-                }
-                request.append(buildEndTag(ONUS_PERLINK))
-                    .append(buildEndTag(VOLT_ONUS));
-            } else {
-                request.append(buildEmptyTag(VOLT_ONUS));
-            }
-            request.append(VOLT_NE_CLOSE);
-
-            reply = controller
-                        .getDevicesMap()
-                        .get(ncDeviceId)
-                        .getSession()
-                        .get(request.toString(), REPORT_ALL);
-        } catch (NetconfException e) {
-            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
-        }
-        return reply;
-    }
 
     @Override
     public String setTipoTrafico(String tipo_trafico) {
         DriverHandler handler = handler();
+        DeviceService deviceService = this.handler().get(DeviceService.class);
         NetconfController controller = handler.get(NetconfController.class);
         MastershipService mastershipService = handler.get(MastershipService.class);
         DeviceId ncDeviceId = handler.data().deviceId();
@@ -158,6 +66,10 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
                      ncDeviceId,
                      mastershipService.getMasterFor(ncDeviceId));
             return null;
+        }
+
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
         }
 
 
@@ -210,6 +122,11 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
             return null;
         }
 
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
+        }
+
 
         if ((!tipo_fec_linea.equals("gfec")) && !(tipo_fec_linea.equals("cerofec"))) {
             log.error("Invalid value of arguments. value: {} result: {}",tipo_fec_linea, ((tipo_fec_linea != "gfec") && (tipo_fec_linea != "cerofec")) );
@@ -258,6 +175,11 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
                     ncDeviceId,
                     mastershipService.getMasterFor(ncDeviceId));
             return null;
+        }
+
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
         }
 
 
@@ -311,6 +233,11 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
             return null;
         }
 
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
+        }
+
 
         try {
             StringBuilder request = new StringBuilder("<edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">");
@@ -354,6 +281,11 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
                     ncDeviceId,
                     mastershipService.getMasterFor(ncDeviceId));
             return null;
+        }
+
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
         }
 
 
@@ -402,6 +334,11 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
         }
 
 
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
+        }
+
         try {
             StringBuilder request = new StringBuilder("<edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">");
             request.append("<target>");
@@ -446,6 +383,11 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
             return null;
         }
 
+
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
+        }
 
         try {
             StringBuilder request = new StringBuilder("<edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">");
@@ -493,6 +435,11 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
             return null;
         }
 
+
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
+        }
 
         try {
             StringBuilder request = new StringBuilder("<edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">");
@@ -549,6 +496,10 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
             return null;
         }
 
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
+        }
 
         try {
             StringBuilder request = new StringBuilder("<edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">");
@@ -601,6 +552,11 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
         }
 
 
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
+        }
+
         try {
             StringBuilder request = new StringBuilder("<edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">");
             request.append("<target>");
@@ -635,9 +591,7 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
         MastershipService mastershipService = handler.get(MastershipService.class);
         DeviceId ncDeviceId = handler.data().deviceId();
         checkNotNull(controller, "Netconf controller is null");
-        String reply = null;
 
-        Boolean vecinopresente = true;
 
         if (!mastershipService.isLocalMaster(ncDeviceId)) {
             log.warn("Not master for {} Use {} to execute command",
@@ -646,20 +600,21 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
             return null;
         }
 
-        AlarmService alarmService = this.handler().get(AlarmService.class);
-        Iterator it = alarmService.getActiveAlarms().iterator();
         DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
+        }
 
-        /**
-         * Pregunto al dispositivo local quien es su vecino.
-         */
-        reply = null;
+
+
+        String local_config = null;
+
         try {
             StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
             request.append("<ports/>");
             request.append("</mux-config>");
 
-            reply = controller
+            local_config = controller
                     .getDevicesMap()
                     .get(ncDeviceId)
                     .getSession()
@@ -668,116 +623,175 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
             log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
         }
 
-        //obtengo la info del vecino en limpio, sin el resto del xml
-        String vecino = getVecino(reply);
-        if (vecino.contains("NO TIENE VECINOS")) {
-            //aplicar config de pecho.
-            log.info("No tiene vecinos");
-        }
+        ArrayList<String> lista_vecinos = getVecino(local_config);
 
+        if ( !lista_vecinos.isEmpty() ) {
 
-        else{
+            log.info("lista no vacia, recorro vecinos");
 
+            ListIterator<String> vecinosIterator = lista_vecinos.listIterator();
 
-            log.info("Tiene vecinos");
+            whileIteratorVecinos: while ( vecinosIterator.hasNext() ) {
 
-            /**
-             * Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
-             */
-            com.google.common.base.Optional<Device> dev = Iterables.tryFind(
-                    deviceService.getAvailableDevices(),
-                    input -> input.serialNumber().equals(vecino));
-            if (!dev.isPresent()) {
-                log.info("Device with chassis ID {} does not exist");
-                vecinopresente = false;
-            }
+                String vecino = vecinosIterator.next();
 
+                log.info("el vecino que se evalua es: {}",vecino);
+                // Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
 
-            if (vecinopresente) {
-                /**
-                 * Pregunto al dispositivo local que configuracion tiene.
-                 */
-                String local = null;
-                try {
-                    StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
-                    request.append("<tipo_trafico/>");
-                    request.append("</mux-config>");
+                com.google.common.base.Optional<Device> dev = Iterables.tryFind(
+                        deviceService.getAvailableDevices(),
+                        input -> input.serialNumber().equals(vecino));
 
-                    local = controller
-                            .getDevicesMap()
-                            .get(ncDeviceId)
-                            .getSession()
-                            .get(request.toString(), REPORT_ALL);
-                } catch (NetconfException e) {
-                    log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
-                }
+                if (!dev.isPresent()) {
+                    log.info("Device with chassis ID {} does not exist");
+                    AlarmService alarmService = this.handler().get(AlarmService.class);
+                    Iterator it = alarmService.getActiveAlarms(ncDeviceId).iterator();
 
-                //obtengo la info de tipo de trafico en limpio, sin el resto del xml
-                local = getTipoTrafico(local);
+                    while (it.hasNext()) {
+                        Alarm b = (Alarm) it.next();
 
+                        if ( b.description().contains("[WARNING] mux-notify xmlns; Inconsistent config with neighbor "+ vecino)  ) {
+                            alarmService.remove(b.id());
+                            log.info("ELIMINO");
+                        }
+                    }
 
-
-                /**
-                 * Pregunto al dispositivo vecino que configuracion tiene.
-                 */
-                String vecin = null;
-                try {
-                    StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
-                    request.append("<tipo_trafico/>");
-                    request.append("</mux-config>");
-                    vecin = controller
-                            .getDevicesMap()
-                            .get(dev.get().id()) //FIX MEEEE, lo tengo que hacer para todos los dispositivos. Aca se hace solo para uno de los vecinos
-                            .getSession()
-                            .get(request.toString(), REPORT_ALL);
-                } catch (NetconfException e) {
-                    log.error("Cannot communicate to device {} exception {}", dev, e);
-                }
-
-                //obtengo la info de tipo de trafico en limpio, sin el resto del xml
-                vecin = getTipoTrafico(vecin);
-
-                NetconfDeviceOutputEvent alarmEvent;
-                if ( local.equals(vecin) ) {
-
-                    alarmEvent = new NetconfDeviceOutputEvent(NetconfDeviceOutputEvent.Type.DEVICE_NOTIFICATION,
-                            null,
-                            "Create Alarm",
-                            null,
-                            controller.getNetconfDevice(ncDeviceId).getDeviceInfo());
-
-                    log.info("Misma configuracion, se elimina alarma");
-
+                    continue whileIteratorVecinos;
                 }
 
                 else {
 
-                    alarmEvent = new NetconfDeviceOutputEvent(NetconfDeviceOutputEvent.Type.DEVICE_NOTIFICATION,
-                            null,
-                            "Delete Alarm",
-                            null,
-                            controller.getNetconfDevice(ncDeviceId).getDeviceInfo());
+
+                    while ( !dev.get().type().toString().equals("OTN") ) {
+                        log.debug("No termino de conectarse el dispositivo, espero.");
+                    }
+
+                    String remote_config = null;
+
+                    log.info("Se encontro el vecino, pregunto por su config");
+                    try {
+                        StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+                        request.append("<tipo_trafico/>");
+                        request.append("</mux-config>");
+
+                        remote_config = controller
+                                .getDevicesMap()
+                                .get(dev.get().id())
+                                .getSession()
+                                .get(request.toString(), REPORT_ALL);
+                    } catch (NetconfException e) {
+                        log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+                    }
+
+                    local_config = null;
 
 
-                    log.info("Distinta configuracion, se crea alarma");
+                    try {
+                        StringBuilder request = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+                        request.append("<tipo_trafico/>");
+                        request.append("</mux-config>");
 
+                        local_config = controller
+                                .getDevicesMap()
+                                .get(ncDeviceId)
+                                .getSession()
+                                .get(request.toString(), REPORT_ALL);
+                    } catch (NetconfException e) {
+                        log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+                    }
+
+
+                    String tipo_local = getTipoTrafico(local_config);
+                    String tipo_remoto = getTipoTrafico(remote_config);
+
+                    log.info("local,remoto : {} {}",tipo_local,tipo_remoto);
+
+                    if (tipo_local.equals(tipo_remoto)) {
+
+                        log.info("Config iguales, se elimina alarma del dispositivo");
+
+                        AlarmService alarmService = this.handler().get(AlarmService.class);
+                        Iterator alarmas_device_local = alarmService.getActiveAlarms(ncDeviceId).iterator();
+
+
+                        Iterator alarmas_device_vecino = alarmService.getActiveAlarms(dev.get().id()).iterator();
+
+
+
+
+                        while (alarmas_device_local.hasNext()) {
+                            Alarm b = (Alarm) alarmas_device_local.next();
+
+                            if ( b.description().contains("[WARNING] mux-notify xmlns; Inconsistent config with neighbor "+ vecino)  ) {
+                                alarmService.remove(b.id());
+                                log.info("ELIMINO");
+                            }
+                        }
+
+                        while (alarmas_device_vecino.hasNext()) {
+                            Alarm b = (Alarm) alarmas_device_vecino.next();
+
+                            if ( b.description().contains("[WARNING] mux-notify xmlns; Inconsistent config with neighbor "+ deviceService.getDevice(ncDeviceId).serialNumber() )  ) {
+                                alarmService.remove(b.id());
+                                log.info("ELIMINO");
+                            }
+                        }
+
+                    }
+
+                    else {
+
+                        log.info("Config distintas, se crea alarma en el dispositivo");
+
+
+                        try {
+                            StringBuilder request = new StringBuilder("<edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">");
+                            request.append("<target>");
+                            request.append("<running/>");
+                            request.append("</target>");
+                            request.append("<default-operation>merge</default-operation>");
+                            request.append("<test-option>set</test-option>");
+                            request.append("<config>");
+                            request.append("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+                            request.append("<warning_config xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" nc:operation=\"replace\">");
+                            request.append(vecino);
+                            request.append("</warning_config>");
+                            request.append("</mux-config>");
+                            request.append("</config>");
+                            request.append("</edit-config>");
+
+                            controller
+                                    .getDevicesMap()
+                                    .get(ncDeviceId)
+                                    .getSession()
+                                    .doWrappedRpc(request.toString());
+                        } catch (NetconfException e) {
+                            log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+                        }
+
+                    }
                 }
-
-
-
-                providerAltura.pushEvent(alarmEvent);
-
-
             }
 
+        }
+        else {
 
+            AlarmService alarmService = this.handler().get(AlarmService.class);
+            Iterator it = alarmService.getActiveAlarms(ncDeviceId).iterator();
+
+            while (it.hasNext()) {
+                Alarm b = (Alarm) it.next();
+
+                if ( b.description().contains("[WARNING] mux-notify xmlns; Inconsistent config with neighbor")  ) {
+                    alarmService.remove(b.id());
+                    log.info("ELIMINO");
+                }
+            }
 
         }
 
 
-
-        log.info("PRUEBA");
-
+        String reply = null;
         /*
         try {
             StringBuilder request = new StringBuilder("<mux-apply-config xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
@@ -791,6 +805,8 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
             log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
         }
         */
+
+
         return reply;
     }
 
@@ -810,6 +826,11 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
             return null;
         }
 
+        DeviceService deviceService = this.handler().get(DeviceService.class);
+        while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            log.debug("No termino de conectarse el dispositivo, espero.");
+        }
+
 
         try {
             StringBuilder request = new StringBuilder("<mux-settings xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
@@ -827,109 +848,27 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
     }
 
 
-
-    /**
-     * Verifies input string for ponlink-id{-onu-id}.
-     *
-     * @param target input data in string
-     * @return String array containing IDs; may be null if an error is detected
-     */
-    private String[] checkIdString(String target) {
-        String[] onuId = target.split(HYPHEN);
-        int pon;
-        int onu;
-
-        if (onuId.length > TWO) {
-            log.error("Invalid number of arguments for id:{}", onuId.length);
-            return null;
-        }
-        try {
-            pon = Integer.parseInt(onuId[FIRST_PART]);
-            if (pon <= ZERO) {
-                log.error("Invalid integer for ponlink-id:{}", onuId[FIRST_PART]);
-                return null;
-            }
-            if (onuId.length > ONE) {
-                onu = Integer.parseInt(onuId[SECOND_PART]);
-                if (onu <= ZERO) {
-                    log.error("Invalid integer for onu-id:{}", onuId[SECOND_PART]);
-                    return null;
-                }
-            }
-        } catch (NumberFormatException e) {
-            log.error("Non-number input for id:{}", target);
-            return null;
-        }
-        return onuId;
-    }
-
-    /**
-     * Verifies input string for valid options.
-     *
-     * @param name input data in string
-     * @param value input data in string
-     * @return true/false if the parameter is valid/invalid
-     */
-    private boolean checkSetParam(String name, String value) {
-        if (!ONUCONFIGPARAMS.contains(name)) {
-            log.error("Unsupported parameter: {}", name);
-            return false;
-        }
-
-        switch (name) {
-            case ADMIN_STATE:
-                if (!validState(ADMINSTATES, name, value)) {
-                    return false;
-                }
-                break;
-            case PASSWORD:
-                if (!value.matches(PASSWORD_PATTERN)) {
-                    log.error("Invalid value for Name {} : Value {}.", name, value);
-                    return false;
-                }
-                break;
-            default:
-                if (!validState(ENABLES, name, value)) {
-                    return false;
-                }
-                break;
-        }
-        return true;
-    }
-
-    /**
-     * Verifies input string for valid options.
-     *
-     * @param states input data in string for parameter state
-     * @param name input data in string for parameter name
-     * @param value input data in string for parameter value
-     * @return true/false if the parameter is valid/invalid
-     */
-    private boolean validState(Set<String> states, String name, String value) {
-        if (!states.contains(value)) {
-            log.error("Invalid value for Name {} : Value {}.", name, value);
-            return false;
-        }
-        return true;
-    }
-
-
     /**
      * Retrieving serial number version of device.
-     * @param version the return of show version command
      * @return the serial number of the device
      */
-    private String getVecino(String version) {
-        log.info(version);
-        String serialNumber = new String();
-        if (version.contains("neighbor")) {
-            serialNumber = StringUtils.substringBetween(version, "<neighbor>", "</neighbor>");
+    private ArrayList<String> getVecino(String config) {
+
+        ArrayList<String> lista_vecinos = new ArrayList<String>();
+
+        while (config.contains("<neighbor>")) {
+            log.info(config);
+            String vecino = StringUtils.substringBetween(config, "<neighbor>", "</neighbor>");
+            config = config.replaceFirst("(?s)<neighbor>.*?</neighbor>", ""); // Borro el primer vecino encontrado. (?s) significa que se aplica a todas las lineas del string.
+            lista_vecinos.add(vecino);
         }
-        else {
-            serialNumber = "NO TIENE VECINOS";
-        }
-        return serialNumber;
+
+        log.info("lista vecinos es:");
+        log.info(lista_vecinos.toString());
+
+        return lista_vecinos;
     }
+
 
     /**
      * Retrieving serial number version of device.
@@ -937,9 +876,14 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
      * @return the serial number of the device
      */
     private String getTipoTrafico(String version) {
+
         log.info(version);
-        String serialNumber = StringUtils.substringBetween(version, "<tipo_trafico>", "</tipo_trafico>");
-        return serialNumber;
+
+        String tipo_trafico = StringUtils.substringBetween(version, "<tipo_trafico>", "</tipo_trafico>");
+        log.info("Tipo trafico es:");
+        log.info(tipo_trafico);
+        return tipo_trafico;
     }
+
 
 }
