@@ -27,7 +27,7 @@ import org.onosproject.incubator.net.faultmanagement.alarm.AlarmService;
 import org.onosproject.incubator.net.faultmanagement.alarm.Alarm;
 import java.util.ArrayList;
 import java.util.ListIterator;
-
+import java.util.concurrent.TimeUnit;
 
 
 public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
@@ -65,7 +65,13 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         Set<LinkDescription> descs = new HashSet<>();
 
         if ( !localdevice.type().toString().equals("OTN") ) {
-            log.debug("NO SON IGUALES");
+            log.info("NO SON IGUALES");
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            }
+            catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
             return null;
         }
 

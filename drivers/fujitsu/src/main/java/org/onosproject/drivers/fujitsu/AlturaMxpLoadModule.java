@@ -26,6 +26,8 @@ import org.onosproject.netconf.NetconfController;
 import org.onosproject.netconf.NetconfException;
 import org.slf4j.Logger;
 
+import java.util.concurrent.TimeUnit;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -38,6 +40,11 @@ public class AlturaMxpLoadModule extends AbstractHandlerBehaviour
 
     private final Logger log = getLogger(AlturaMxpGetAll.class);
 
+    private static final String LOAD_MODULE_INICIO_RPC = "<load xmlns=\"http://yuma123.org/ns/yuma123-system\">" +
+            "<module>";
+
+    private static final String LOAD_MODULE_FINAL_RPC = "</module>" +
+            "</load>";
 
     @Override
     public String loadModule(String module) {
@@ -57,19 +64,21 @@ public class AlturaMxpLoadModule extends AbstractHandlerBehaviour
 
         DeviceService deviceService = this.handler().get(DeviceService.class);
         while ( !deviceService.getDevice(ncDeviceId).type().toString().equals("OTN") ) {
+            try {
+                TimeUnit.SECONDS.sleep(10);
+            }
+            catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
             log.debug("No termino de conectarse el dispositivo, espero.");
         }
 
         try {
-            StringBuilder   request = new StringBuilder("<load xmlns=\"http://yuma123.org/ns/yuma123-system\">");
-                            request.append( "<module>" + module + "</module>");
-                            request.append("</load>");
-
             reply = controller
                     .getDevicesMap()
                     .get(ncDeviceId)
                     .getSession()
-                    .doWrappedRpc(request.toString());
+                    .doWrappedRpc(LOAD_MODULE_INICIO_RPC + module + LOAD_MODULE_FINAL_RPC);
         } catch (NetconfException e) {
             log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
         }

@@ -57,7 +57,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
 
         /**
          * Lo primero que hago es ver el tiempo que paso desde que se conecto el dispositivo.
-         * El mismo, debe ser mayor a 30 segundos para dar tiempo al mxp a conectarse correctamente con onos.
+         * El mismo, debe ser mayor a 30 segundos para dar tiempo al mxp a conectarse correctamente con onos (intercambiar los mensajes hello).
          */
         String tiempo_conectado = devicecontroller.localStatus(deviceId); //obtengo tiempo transcurrido en string
         tiempo_conectado = tiempo_conectado.replaceAll("\\D+",""); //obtengo solo la parte entera
@@ -65,6 +65,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
             tiempo_conectado = "0"; //si no tiene info, es 0
         }
         int tiempo_conectado_int = Integer.parseInt(tiempo_conectado); // casteo de String a int
+
         while (tiempo_conectado_int < 30) { //mientras que es menor a 30 segundos, repetir
             devicecontroller = checkNotNull(handler().get(DeviceService.class));
             deviceId = handler().data().deviceId();
