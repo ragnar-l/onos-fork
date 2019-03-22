@@ -21,17 +21,19 @@ import org.apache.commons.lang.StringUtils;
 import org.onosproject.incubator.net.faultmanagement.alarm.Alarm;
 import org.onosproject.incubator.net.faultmanagement.alarm.AlarmService;
 import org.onosproject.mastership.MastershipService;
+import org.onosproject.net.ConnectPoint;
 import org.onosproject.net.Device;
 import org.onosproject.net.DeviceId;
+import org.onosproject.net.Port;
 import org.onosproject.net.behaviour.MxpConfig;
 import org.onosproject.net.device.DeviceService;
 import org.onosproject.net.driver.AbstractHandlerBehaviour;
 import org.onosproject.net.driver.DriverHandler;
+import org.onosproject.net.link.LinkAdminService;
 import org.onosproject.netconf.NetconfController;
 import org.onosproject.netconf.NetconfException;
 import org.slf4j.Logger;
 import java.util.ArrayList;
-import java.util.ListIterator;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.onosproject.drivers.fujitsu.FujitsuVoltXmlUtility.*;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -67,6 +69,23 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
     private static final String WARNING_CONFIG_ALARM = "[WARNING] mux-notify xmlns; Inconsistent config with neighbor ";
 
     private static final String MUX_SETTINGS_RPC = "<mux-settings xmlns=\"http://fulgor.com/ns/cli-mxp\"/>";
+
+
+    private static final String CREATE_REPLACE_NEIGHBOR_START = "<edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">" +
+            "<target>" +
+            "<running/>" +
+            "</target>" +
+            "<default-operation>merge</default-operation>" +
+            "<test-option>set</test-option>" +
+            "<config>" +
+            "<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">" +
+            "<ports xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" nc:operation=\"replace\">";
+
+    private static final String CREATE_REPLACE_NEIGHBOR_END = "</ports>" +
+            "</mux-config>" +
+            "</config>" +
+            "</edit-config>";
+
 
 
     @Override
@@ -401,39 +420,27 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
             }
         }
 
+        checkLink(local_port);
+
         try {
-            StringBuilder request = new StringBuilder("<edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">");
-            request.append("<target>");
-            request.append("<running/>");
-            request.append("</target>");
-            request.append("<default-operation>merge</default-operation>");
-            request.append("<test-option>set</test-option>");
-            request.append("<config>");
-            request.append("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
-            request.append("<ports xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" nc:operation=\"replace\">");
-
-            request.append("<port>");
-            request.append(local_port);
-            request.append("</port>");
-
-            request.append("<neighbor>");
-            request.append(neighbor);
-            request.append("</neighbor>");
-
-            request.append("<port_neighbor>");
-            request.append(remote_port);
-            request.append("</port_neighbor>");
-
-            request.append("</ports>");
-            request.append("</mux-config>");
-            request.append("</config>");
-            request.append("</edit-config>");
 
             reply = controller
                     .getDevicesMap()
                     .get(ncDeviceId)
                     .getSession()
-                    .doWrappedRpc(request.toString());
+                    .doWrappedRpc(CREATE_REPLACE_NEIGHBOR_START +
+                            "<port>" +
+                            local_port +
+                            "</port>" +
+                            "<neighbor>" +
+                            neighbor +
+                            "</neighbor>" +
+                            "<port_neighbor>" +
+                            remote_port +
+                            "</port_neighbor>" +
+                            CREATE_REPLACE_NEIGHBOR_END
+
+                    );
         } catch (NetconfException e) {
             log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
         }
@@ -466,6 +473,8 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
                 Thread.currentThread().interrupt();
             }
         }
+
+        checkLink(puerto);
 
         try {
             StringBuilder request = new StringBuilder("<edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">");
@@ -607,12 +616,12 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
             }
 
 
+            int len_vecinos = lista_vecinos.size();
 
-            ListIterator<String> vecinosIterator = lista_vecinos.listIterator();
 
-            whileIteratorVecinos: while ( vecinosIterator.hasNext() ) {
+            forVecinos: for (int i_vecinos = 0; i_vecinos < len_vecinos; i_vecinos++) {
 
-                String vecino = vecinosIterator.next();
+                String vecino = lista_vecinos.get(i_vecinos);
 
                 /**
                  * Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
@@ -628,15 +637,15 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
 
                     log.info("[rpcApplyConfig] Dispositivo vecino no presente, se borran alarmas");
 
-                    int len = alarmas_local.size();
-                    for (int i = 0; i < len; i++) {
-                        Alarm alarma_local = alarmas_local.get(i);
+                    int len_alarmas = alarmas_local.size();
+                    for (int i_alarmas = 0; i_alarmas < len_alarmas; i_alarmas++) {
+                        Alarm alarma_local = alarmas_local.get(i_alarmas);
                         if ( alarma_local.description().contains(WARNING_CONFIG_ALARM + vecino)  ) {
                             alarmService.remove(alarma_local.id());
                         }
                     }
 
-                    continue whileIteratorVecinos;
+                    continue forVecinos;
                 }
 
                 else {
@@ -667,9 +676,9 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
                         //Si la configuracion es la misma, borro alarmas.
 
                         log.info("[rpcApplyConfig] Misma configuracion entre dispositivos, se borran alarmas");
-                        int len = alarmas_local.size();
-                        for (int i = 0; i < len; i++) {
-                            Alarm alarma_local = alarmas_local.get(i);
+                        int len_alarmas = alarmas_local.size();
+                        for (int i_alarmas = 0; i_alarmas < len_alarmas; i_alarmas++) {
+                            Alarm alarma_local = alarmas_local.get(i_alarmas);
                             if ( alarma_local.description().contains(WARNING_CONFIG_ALARM + vecino)  ) {
                                 alarmService.remove(alarma_local.id());
                             }
@@ -679,9 +688,9 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
                         alarmas_vecino.addAll(alarmService.getActiveAlarms(dev.get().id()));
 
 
-                        len = alarmas_vecino.size();
-                        for (int i = 0; i < len; i++) {
-                            Alarm alarma_vecino = alarmas_vecino.get(i);
+                        len_alarmas = alarmas_vecino.size();
+                        for (int i_alarmas = 0; i_alarmas < len_alarmas; i_alarmas++) {
+                            Alarm alarma_vecino = alarmas_vecino.get(i_alarmas);
                             if ( alarma_vecino.description().contains(WARNING_CONFIG_ALARM + deviceService.getDevice(ncDeviceId).serialNumber())  ) {
                                 alarmService.remove(alarma_vecino.id());
                             }
@@ -712,9 +721,9 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
         else {
             // no tiene vecinos, por lo tanto elimino todas las alarmas WARNING en ONOS.
             log.info("[rpcApplyConfig] Sin vecinos, se borran alarmas");
-            int len = alarmas_local.size();
-            for (int i = 0; i < len; i++) {
-                Alarm alarma_local = alarmas_local.get(i);
+            int len_alarmas = alarmas_local.size();
+            for (int i_alarmas = 0; i_alarmas < len_alarmas; i_alarmas++) {
+                Alarm alarma_local = alarmas_local.get(i_alarmas);
                 if ( alarma_local.description().contains(WARNING_CONFIG_ALARM)  ) {
                     alarmService.remove(alarma_local.id());
                 }
@@ -836,6 +845,117 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
 
         return request;
     }
+
+
+    /**
+     * Retrieving ports topology of device.
+     * @param parse la respuesta del dispositivo a la consulta por sus puertos.
+     * @return una lista de puertos.
+     */
+    private ArrayList<AlturaMxpPuertos> getPuertos(String parse) {
+
+        ArrayList<AlturaMxpPuertos> lista_puertos = new ArrayList<AlturaMxpPuertos>();
+
+
+        while (parse.contains("ports")) {
+            AlturaMxpPuertos p = new AlturaMxpPuertos();
+
+            String info = StringUtils.substringBetween(parse, "<ports>", "</ports>"); // a esto tengo que sacar la info sobre puerto, vecino y puerto vecino
+
+            String info_nombre_puerto = StringUtils.substringBetween(info, "<port>", "</port>");
+            p.setPuerto(Integer.valueOf(info_nombre_puerto));
+
+            String info_nombre_vecino = StringUtils.substringBetween(info, "<neighbor>", "</neighbor>");
+            p.setVecino(Integer.valueOf(info_nombre_vecino));
+
+            String info_nombre_puerto_vecino = StringUtils.substringBetween(info, "<port_neighbor>", "</port_neighbor>");
+            p.setPuertoVecino(Integer.valueOf(info_nombre_puerto_vecino));
+
+            parse = parse.replaceFirst("(?s)<ports>.*?</ports>", ""); // (?s) significa que se aplica a todas las lineas del string.
+
+            lista_puertos.add(p);
+        }
+
+        return lista_puertos;
+    }
+
+
+
+
+    /**
+     * Borra los links formados (si los hubiera) entre el device local y el vecino.
+     * @param puerto_afectado el puerto local que se borrara o modificara.
+     */
+    private void checkLink(String puerto_afectado) {
+
+        //pruebo que no sea puerto transmisor - receptor
+        if (Integer.parseInt(puerto_afectado) > 1) {
+            DriverHandler handler = handler();
+            NetconfController controller = handler.get(NetconfController.class);
+            MastershipService mastershipService = handler.get(MastershipService.class);
+            DeviceId ncDeviceId = handler.data().deviceId();
+            checkNotNull(controller, "Netconf controller is null");
+            DeviceService deviceService = this.handler().get(DeviceService.class);
+
+
+            String reply = new String();
+            try {
+                StringBuilder consulta_vecinos = new StringBuilder("<mux-config xmlns=\"http://fulgor.com/ns/cli-mxp\">");
+                consulta_vecinos.append("<ports/>");
+                consulta_vecinos.append("</mux-config>");
+
+                reply = controller
+                        .getDevicesMap()
+                        .get(ncDeviceId)
+                        .getSession()
+                        .get(consulta_vecinos.toString(), REPORT_ALL);
+            } catch (NetconfException e) {
+                log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
+            }
+
+            ArrayList<AlturaMxpPuertos> lista_puertos = getPuertos(reply);
+
+            int len_vecinos = lista_puertos.size();
+            for (int i_vecinos = 0; i_vecinos < len_vecinos; i_vecinos++) {
+
+                if ( lista_puertos.get(i_vecinos).getPuerto() == Integer.parseInt(puerto_afectado) ) {
+
+                    if (lista_puertos.get(i_vecinos).getVecino()<10) {
+                        int a =lista_puertos.get(i_vecinos).getVecino();
+
+                        com.google.common.base.Optional<Device> dev = Iterables.tryFind(
+                                deviceService.getAvailableDevices(),
+                                input -> input.id().toString().equals("of:000000000000000"+Integer.toString( a )));
+
+                        if ( !dev.isPresent() ) {
+                            log.info("no esta el of");
+                            return;
+                        }
+
+                        else {
+                            LinkAdminService linkService  = handler.get(LinkAdminService.class);
+                            Port localPort = deviceService.getPorts(ncDeviceId).get(Integer.parseInt(puerto_afectado));
+                            ConnectPoint local = new ConnectPoint(ncDeviceId, localPort.number());
+
+
+                            Device remoteDevice = dev.get();
+                            Port remotePort = deviceService.getPorts(remoteDevice.id()).get(1);
+                            ConnectPoint remote = new ConnectPoint(remoteDevice.id(), remotePort.number());
+
+                            if (linkService.getLink(local,remote)!=null) {
+                                log.info("borro link");
+                                //linkService.removeLink(local,remote);
+                                linkService.removeLink(remote,local);
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+
+    }
+
 
 
 }

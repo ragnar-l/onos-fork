@@ -21,10 +21,10 @@ import org.onosproject.net.driver.AbstractDriverLoaderTest;
 /**
  * Fujistu driver loader test.
  */
-public class FujitsuDriversLoaderTest extends AbstractDriverLoaderTest {
+public class AlturaDriversLoaderTest extends AbstractDriverLoaderTest {
 
     @Before
     public void setUp() {
-        loader = new FujitsuDriversLoader();
+        loader = new AlturaDriversLoader();
     }
 }

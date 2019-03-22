@@ -26,9 +26,8 @@ import org.apache.commons.lang.StringUtils;
 import org.onosproject.incubator.net.faultmanagement.alarm.AlarmService;
 import org.onosproject.incubator.net.faultmanagement.alarm.Alarm;
 import java.util.ArrayList;
-import java.util.ListIterator;
 import java.util.concurrent.TimeUnit;
-
+import org.onosproject.net.link.LinkAdminService;
 
 public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
         implements LinkDiscovery {
@@ -99,30 +98,35 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
 
 
 
-            ArrayList<AlturaMxpPuertos> lista_puertos = puertos(reply);
+            ArrayList<AlturaMxpPuertos> lista_puertos = getPuertos(reply);
             DeviceId localDeviceId = this.handler().data().deviceId();
 
             if ( !lista_puertos.isEmpty() ) {
-                ListIterator<AlturaMxpPuertos> puertosIterator = lista_puertos.listIterator();
-                log.info("-- La lista de puertos contiene vecinos --");
 
-                aLoopName: while ( puertosIterator.hasNext() ) {
+                int len = lista_puertos.size();
 
-                    AlturaMxpPuertos p = puertosIterator.next();
-                    log.info("El puerto local es {}", p.getPuerto() );
-                    log.info("El vecino es {}", p.getVecino() );
-                    log.info("El puerto vecino es {}", p.getPuertoVecino() );
+                aLoopName: for (int i = 0; i < len; i++) {
+
+                    AlturaMxpPuertos p = lista_puertos.get(i);
 
 
+                    if ( p.getPuerto() == 0 ) {
 
-
-
-                    if ( (p.getVecino() == 1) || (p.getVecino() == 2) ) {
-
-                        if ( (p.getPuerto() < 1)) {
-                            log.info("Se esperaba puerto de cliente");
+                        if (p.getPuertoVecino() != 1) {
+                            log.info("Se esperaba puerto de Receptor");
                             continue aLoopName;
                         }
+                    }
+
+                    else if ( p.getPuerto() == 1 ) {
+
+                        if (p.getPuertoVecino() != 0) {
+                            log.info("Se esperaba puerto de Transmisor");
+                            continue aLoopName;
+                        }
+                    }
+
+                    else if (p.getPuerto() > 1) {
 
                         com.google.common.base.Optional<Device> dev = Iterables.tryFind(
                                 deviceService.getAvailableDevices(),
@@ -170,26 +174,35 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                             }
 
                             else {
+
+                                LinkAdminService linkService  = handler.get(LinkAdminService.class);
+
+                                //no armo nada
+
                                 Port localPort = deviceService.getPorts(localDeviceId).get(p.getPuerto());
                                 ConnectPoint local = new ConnectPoint(localDeviceId, localPort.number());
 
                                 Device remoteDevice = dev.get();
                                 Port remotePort = deviceService.getPorts(remoteDevice.id()).get(1);
-                                DefaultAnnotations annotations = DefaultAnnotations.builder().set("layer", "IP").build();
                                 ConnectPoint remote = new ConnectPoint(remoteDevice.id(), remotePort.number());
+
+
+                                log.info("borro link");
+                                //linkService.removeLink(local,remote);
+                                linkService.removeLink(remote,local);
+
+
+                                /**
+                                 * DefaultAnnotations annotations = DefaultAnnotations.builder().set("layer", "IP").build();
                                 descs.add(new DefaultLinkDescription(
                                         remote, local, Link.Type.OPTICAL, false, annotations));
+                                 **/
                             }
                         }
                         continue aLoopName;
                     }
 
-                    else {
-
-                        if ( (p.getPuerto() > 1) || (p.getPuertoVecino() > 1)) {
-                            log.info("Se esperaba puerto de linea");
-                            continue aLoopName;
-                        }
+                    if ( (p.getPuerto()==0) || (p.getPuerto()==1) ) {
 
                         /**
                          * Se busca en los dispositivos actualmente conectados si hay alguno con un numero de serie que coincida con el indicado por el dispositivo como vecino.
@@ -262,7 +275,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
      * @param parse la respuesta del dispositivo a la consulta por sus puertos.
      * @return una lista de puertos.
      */
-    private ArrayList<AlturaMxpPuertos> puertos(String parse) {
+    private ArrayList<AlturaMxpPuertos> getPuertos(String parse) {
 
         ArrayList<AlturaMxpPuertos> lista_puertos = new ArrayList<AlturaMxpPuertos>();
 

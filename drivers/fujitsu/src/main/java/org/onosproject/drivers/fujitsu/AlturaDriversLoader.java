@@ -28,7 +28,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * Loader for Fujitsu device drivers.
  */
 @Component(immediate = true)
-public class FujitsuDriversLoader extends AbstractDriverLoader {
+public class AlturaDriversLoader extends AbstractDriverLoader {
 
     // OSGI: help bundle plugin discover runtime package dependency.
     @SuppressWarnings("unused")
@@ -40,8 +40,7 @@ public class FujitsuDriversLoader extends AbstractDriverLoader {
     private final Logger log = getLogger(AlturaMxpConfig.class);
 
 
-    public FujitsuDriversLoader() {
+    public AlturaDriversLoader() {
         super("/altura-drivers.xml");
-        log.info("FujitsuDriversLoader");
     }
 }

@@ -49,6 +49,22 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
 
     private final Logger log = getLogger(getClass());
 
+    private static final String CONSULTA_DEVICE_TYPE_LEAF = "<get>" +
+            "<filter type=\"subtree\">" +
+            "<mux-state xmlns=\"http://fulgor.com/ns/cli-mxp\">" +
+            "<device_manufacturer/>" +
+            "<device_swVersion/>" +
+            "<device_hwVersion/>" +
+            "<device_boardId/>" +
+            "</mux-state>" +
+            "</filter>" +
+            "</get>";
+
+    private static final String CREATE_SUB = "<create-subscription xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">" +
+            "</create-subscription>";
+
+    private static final String INITIAL_ALARMS = "<mux-notify-activate xmlns=\"http://fulgor.com/ns/cli-mxp\"/>";
+
     @Override
     public DeviceDescription discoverDeviceDetails() {
 
@@ -92,20 +108,9 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         }
 
 
-        StringBuilder request = new StringBuilder("<get>");
-        request.append("<filter type=\"subtree\">");
-        request.append("<mux-state xmlns=\"http://fulgor.com/ns/cli-mxp\">");
-        request.append("<device_manufacturer/>");
-        request.append("<device_swVersion/>");
-        request.append("<device_hwVersion/>");
-        request.append("<device_boardId/>");
-        request.append("</mux-state>");
-        request.append("</filter>");
-        request.append("</get>");
-
         String info_device = null;
         try {
-            info_device = session.doWrappedRpc(request.toString());
+            info_device = session.doWrappedRpc(CONSULTA_DEVICE_TYPE_LEAF);
         } catch (NetconfException e) {
             log.info("NetconfException en AlturaMxpDeviceDescription - Info device");
             throw new IllegalStateException(new NetconfException("Failed to retrieve version info.", e));
@@ -117,10 +122,8 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
         details[2] = getSwVersion(info_device);
         details[3] = serialNumber(info_device);
 
-        StringBuilder suscribe = new StringBuilder("<create-subscription xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">");
-        suscribe.append("</create-subscription>");
         try {
-            session.doWrappedRpc(suscribe.toString());
+            session.doWrappedRpc(CREATE_SUB);
 
         } catch (NetconfException e) {
             log.info("NetconfException en AlturaMxpDeviceDescription - Subscribe");
@@ -134,8 +137,7 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
 
 
         try {
-            request = new StringBuilder("<mux-notify-activate xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
-            session.doWrappedRpc(request.toString());
+            session.doWrappedRpc(INITIAL_ALARMS);
         } catch (NetconfException e) {
             log.error("Cannot communicate to device {} exception {}", ncDevice, e);
         }
@@ -227,7 +229,12 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
      * @return the manufacturer of the device
      */
     private static String getManufacturer(String version) {
-        String manufacturer = StringUtils.substringBetween(version, "<device_manufacturer>", "</device_manufacturer>");
+
+        String manufacturer = "null";
+        if (version.contains("<device_manufacturer>")) {
+            manufacturer = StringUtils.substringBetween(version, "<device_manufacturer>", "</device_manufacturer>");
+        }
+
         return manufacturer;
     }
 
@@ -238,7 +245,10 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
      * @return the sw version of the device
      */
     private static String getSwVersion(String version) {
-        String swVersion = StringUtils.substringBetween(version, "<device_swVersion>", "</device_swVersion>");
+        String swVersion = "null";
+        if (version.contains("<device_swVersion>")) {
+            swVersion = StringUtils.substringBetween(version, "<device_swVersion>", "</device_swVersion>");
+        }
         return swVersion;
     }
 
@@ -249,7 +259,10 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
      * @return the hw version of the device
      */
     private static String getHwVersion(String version) {
-        String hwVersion = StringUtils.substringBetween(version, "<device_hwVersion>", "</device_hwVersion>");
+        String hwVersion = "null";
+        if (version.contains("<device_hwVersion>")) {
+            hwVersion = StringUtils.substringBetween(version, "<device_hwVersion>", "</device_hwVersion>");
+        }
         return hwVersion;
     }
 
@@ -260,7 +273,10 @@ public class AlturaMxpDeviceDescription extends AbstractHandlerBehaviour
      * @return the serial number of the device
      */
     private static String serialNumber(String version) {
-        String serialNumber = StringUtils.substringBetween(version, "<device_boardId>", "</device_boardId>");
+        String serialNumber = "null";
+        if (version.contains("<device_boardId>")) {
+            serialNumber = StringUtils.substringBetween(version, "<device_boardId>", "</device_boardId>");
+        }
         return serialNumber;
     }
 

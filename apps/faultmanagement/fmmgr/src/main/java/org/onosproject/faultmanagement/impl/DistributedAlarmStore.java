@@ -73,12 +73,12 @@ public class DistributedAlarmStore
         alarms = storageService.<AlarmId, Alarm>consistentMapBuilder()
                 .withName("onos-alarm-table")
                 .withSerializer(Serializer.using(KryoNamespaces.API,
-                                                 Alarm.class,
-                                                 DefaultAlarm.class,
-                                                 AlarmId.class,
-                                                 AlarmEvent.Type.class,
-                                                 Alarm.SeverityLevel.class,
-                                                 AlarmEntityId.class))
+                        Alarm.class,
+                        DefaultAlarm.class,
+                        AlarmId.class,
+                        AlarmEvent.Type.class,
+                        Alarm.SeverityLevel.class,
+                        AlarmEntityId.class))
                 .build();
         alarms.addListener(listener);
         alarmsMap = alarms.asJavaMap();
@@ -110,28 +110,17 @@ public class DistributedAlarmStore
     public Collection<Alarm> getAlarms(DeviceId deviceId) {
         //FIXME: this is expensive, need refactoring when core maps provide different indexes.
         return ImmutableSet.copyOf(alarmsMap.values().stream()
-                                           .filter(alarm -> alarm.deviceId().equals(deviceId))
-                                           .collect(Collectors.toSet()));
+                .filter(alarm -> alarm.deviceId().equals(deviceId))
+                .collect(Collectors.toSet()));
     }
 
     @Override
     public void createOrUpdateAlarm(Alarm alarm) {
         Alarm existing = alarmsMap.get(alarm.id());
         if (Objects.equals(existing, alarm)) {
-            log.info("Received identical alarm, no operation needed on {}", alarm.id());
+            log.debug("Received identical alarm, no operation needed on {}", alarm.id());
         } else {
-            if ( alarm.description().contains("[--]") && alarm.description().contains("mux-notify xmlns")) {
-                //log.info("SI CONTIENE");
-                try {
-                    alarms.remove(alarm.id());
-                }
-                catch (Exception e){
-
-                }
-            }
-            else {
-                alarms.put(alarm.id(), alarm);
-            }
+            alarms.put(alarm.id(), alarm);
         }
     }
 
