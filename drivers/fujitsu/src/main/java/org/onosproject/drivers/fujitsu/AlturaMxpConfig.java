@@ -866,7 +866,7 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
             p.setPuerto(Integer.valueOf(info_nombre_puerto));
 
             String info_nombre_vecino = StringUtils.substringBetween(info, "<neighbor>", "</neighbor>");
-            p.setVecino(Integer.valueOf(info_nombre_vecino));
+            p.setVecino(info_nombre_vecino);
 
             String info_nombre_puerto_vecino = StringUtils.substringBetween(info, "<port_neighbor>", "</port_neighbor>");
             p.setPuertoVecino(Integer.valueOf(info_nombre_puerto_vecino));
@@ -920,8 +920,8 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
 
                 if ( lista_puertos.get(i_vecinos).getPuerto() == Integer.parseInt(puerto_afectado) ) {
 
-                    if (lista_puertos.get(i_vecinos).getVecino()<10) {
-                        int a =lista_puertos.get(i_vecinos).getVecino();
+                    if (Integer.parseInt(lista_puertos.get(i_vecinos).getVecino())<10) {
+                        int a = Integer.parseInt(lista_puertos.get(i_vecinos).getVecino());
 
                         com.google.common.base.Optional<Device> dev = Iterables.tryFind(
                                 deviceService.getAvailableDevices(),

@@ -4,7 +4,7 @@ public class AlturaMxpPuertos
 {
     // Atributos de la clase AlturaMxpPuertos
     private int puerto;
-    private int vecino;
+    private String vecino;
     private int puerto_vecino;
 
     // Métodos de la clase AlturaMxpPuertos
@@ -13,7 +13,7 @@ public class AlturaMxpPuertos
         return this.puerto;
     }
 
-    public int getVecino() {
+    public String getVecino() {
         return this.vecino;
     }
 
@@ -25,7 +25,7 @@ public class AlturaMxpPuertos
         this.puerto = n;
     }
 
-    public void setVecino(int n) {
+    public void setVecino(String n) {
         this.vecino = n;
     }
 

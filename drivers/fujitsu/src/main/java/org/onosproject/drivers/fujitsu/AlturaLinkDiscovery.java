@@ -130,10 +130,10 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
 
                         com.google.common.base.Optional<Device> dev = Iterables.tryFind(
                                 deviceService.getAvailableDevices(),
-                                input -> input.id().toString().equals("of:000000000000000"+Integer.toString(p.getVecino())));
+                                input -> input.id().toString().equals(p.getVecino()));
 
                         if (!dev.isPresent()) {
-                            log.info("no esta el of:"+Integer.toString(p.getVecino()));
+                            log.info("no esta el of:"+p.getVecino());
                             continue aLoopName;
                         }
 
@@ -209,10 +209,10 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
                          */
                         com.google.common.base.Optional<Device> dev = Iterables.tryFind(
                                 deviceService.getAvailableDevices(),
-                                input -> input.serialNumber().equals( Integer.toString( p.getVecino() ) ) );
+                                input -> input.serialNumber().equals(  p.getVecino() ) );
 
                         if (!dev.isPresent()) {
-                            log.info( "Device with chassis ID {} does not exist", Integer.toString(p.getVecino()) );
+                            log.info( "Device with chassis ID {} does not exist", p.getVecino() );
                             continue aLoopName;
                         }
 
@@ -289,7 +289,7 @@ public class AlturaLinkDiscovery extends AbstractHandlerBehaviour
             p.setPuerto(Integer.valueOf(info_nombre_puerto));
 
             String info_nombre_vecino = StringUtils.substringBetween(info, "<neighbor>", "</neighbor>");
-            p.setVecino(Integer.valueOf(info_nombre_vecino));
+            p.setVecino(info_nombre_vecino);
 
             String info_nombre_puerto_vecino = StringUtils.substringBetween(info, "<port_neighbor>", "</port_neighbor>");
             p.setPuertoVecino(Integer.valueOf(info_nombre_puerto_vecino));
