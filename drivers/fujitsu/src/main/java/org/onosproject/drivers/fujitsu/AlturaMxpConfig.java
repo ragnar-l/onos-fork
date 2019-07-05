@@ -732,7 +732,7 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
 
 
         String reply = null;
-        /*
+
         try {
             StringBuilder request = new StringBuilder("<mux-apply-config xmlns=\"http://fulgor.com/ns/cli-mxp\"/>");
 
@@ -744,7 +744,7 @@ public class AlturaMxpConfig extends AbstractHandlerBehaviour
         } catch (NetconfException e) {
             log.error("Cannot communicate to device {} exception {}", ncDeviceId, e);
         }
-        */
+
 
 
         return reply;
